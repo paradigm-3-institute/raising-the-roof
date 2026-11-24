@@ -1,11 +1,16 @@
 """The results page: every configuration and run behind "Raising the Roof", laid out by the questions the post asks.
 
-    python3 site/build.py [-o DIR]
+    python3 site/build.py [--blog] [-o DIR]
 
-Writes DIR/index.html (default: site/out/), one self-contained file. It inlines data/runs.csv verbatim and the
-configuration table from analysis/configs.py, and offers both as downloads. Every gap, interval, flag count and λ comes
-from analysis/common.py, analysis/configs.py and analysis/lam.py, so the page and the analysis scripts agree. The only
-request the page makes is for the Instrument Sans font from Google Fonts. Layout and code: site/template.html.
+--blog  the page for the Paradigm 3 blog, which shows it in an iframe on the post's data page (/research/swarms/data):
+        no title block (the blog's page has its own), and the frame sized to the page, with the page's links and
+        scrolling working inside it.
+
+Writes DIR/index.html (default: site/out/), or DIR/swarms.html with --blog, one self-contained file. It inlines
+data/runs.csv verbatim and the configuration table from analysis/configs.py, and offers both as downloads. Every gap,
+interval, flag count and λ comes from analysis/common.py, analysis/configs.py and analysis/lam.py, so the page and the
+analysis scripts agree. The only request the page makes is for the Instrument Sans font from Google Fonts. Layout and
+code: site/template.html.
 
 A view answers one question. It lays out configurations as grids, one per task and budget; each grid cell holds a
 configuration, its reference (normally the same model's single agent at the same total budget) and the comparison.
@@ -29,6 +34,7 @@ import lam as L  # noqa: E402
 DATA_AS_OF = '2026-11-24'
 
 ap = argparse.ArgumentParser(description=__doc__.split('\n\n')[0])
+ap.add_argument('--blog', action='store_true', help="the iframe page for the Paradigm 3 blog's data page")
 ap.add_argument('-o', '--out', type=Path, default=HERE / 'out', help='output folder (default: site/out/)')
 args = ap.parse_args()
 t0 = time.time()
@@ -419,10 +425,48 @@ payload = {
 }
 data = json.dumps(payload, separators=(',', ':'), ensure_ascii=False).replace('</', '<\\/')
 template = (HERE / 'template.html').read_text(encoding='utf-8')
+
+
+def swap(text, old, new):
+    assert text.count(old) == 1, old
+    return text.replace(old, new)
+
+
+# The blog page runs in an <iframe srcdoc> on the post's data page (src/components/mdx/Swarms.astro in the blog repo), so
+# its styles and the site's stay apart. The blog's page carries the title. A script sizes the frame to the page, so the
+# page never scrolls by itself: its scrolling moves the post instead. A srcdoc page resolves "#view" links against the
+# post's own URL, so following one would load the whole post into the frame; the script routes them to go() instead.
+BLOG_HEAD = """<script>
+(() => {
+  const replace = history.replaceState.bind(history);          // about:srcdoc refuses #view URLs; skip them
+  history.replaceState = (...a) => { try { replace(...a); } catch {} };
+  const frame = window.frameElement;
+  if (!frame) return;
+  const fit = () => { frame.style.height = Math.ceil(document.body.getBoundingClientRect().height) + "px"; };
+  window.scrollTo = (x, y) => {                                 // only ever called to go to the top of a view
+    const top = frame.getBoundingClientRect().top + (typeof x === "object" ? x.top || 0 : y || 0);
+    if (top < 0) parent.scrollBy(0, top);
+  };
+  window.scrollBy = (x, y) => parent.scrollBy(typeof x === "object" ? x : { left: x, top: y });
+  document.addEventListener("click", e => {
+    const a = e.target.closest('a[href^="#"]');
+    if (!a || a.hasAttribute("data-dl") || e.defaultPrevented) return;
+    e.preventDefault();
+    go(a.getAttribute("href"), true);
+  });
+  addEventListener("DOMContentLoaded", () => { new ResizeObserver(fit).observe(document.body); fit(); });
+})();
+</script>
+</head>"""
+name = 'index.html'
+if args.blog:
+    template = swap(template, '<header class="top"><h1>Raising the Roof: all results</h1>', '<header class="top">')
+    template = swap(template, '</head>', BLOG_HEAD)
+    name = 'swarms.html'
 assert template.count('/*PAYLOAD*/null') == 1
 page = template.replace('/*PAYLOAD*/null', data)
 args.out.mkdir(parents=True, exist_ok=True)
-(args.out / 'index.html').write_text(page, encoding='utf-8')
+(args.out / name).write_text(page, encoding='utf-8')
 n_lam = sum(len(x) for x in LAM.values())
-print(f"wrote {args.out / 'index.html'} ({len(page.encode()) / 1024:.0f} kB): {len(ROWS)} configurations, "
+print(f"wrote {args.out / name} ({len(page.encode()) / 1024:.0f} kB): {len(ROWS)} configurations, "
       f"{len(payload['runCell'])} runs, {len(VIEWS)} views, {n_lam} λ values, {time.time() - t0:.0f} s")
