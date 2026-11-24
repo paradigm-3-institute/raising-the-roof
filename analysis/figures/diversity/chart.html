@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mixed teams</title>
+<link rel="stylesheet" href="../_kit/kit.css">
+<style>.nb { white-space: nowrap; }</style>
+</head>
+<body>
+<div id="frame">
+  <header>
+    <div class="mark"></div>
+    <div>
+      <h1 id="title"></h1>
+      <div class="sub" id="sub"></div>
+    </div>
+  </header>
+  <div id="lead"></div>
+  <div id="chart"><svg id="svg"></svg></div>
+  <footer id="foot"></footer>
+</div>
+<script src="../_kit/kit.js"></script>
+<script>
+// Diversity figure: does mixing Claude and GPT models in one team help? (appendix "Does model diversity help?")
+// Every mixed team against its two one-model teams of the same size and setup, placed by its score gap to the best
+// single agent at the same budget (8M weighted tokens). One shared axis, so sizes compare across tasks.
+// Each task opens with the best single agent's own runs: the yardstick for run-to-run noise.
+// Numbers: tally.py next to this file (from data/runs.csv; python3 analysis/figures/diversity/tally.py --write),
+// which writes DATA. The kit owns svg, W, H, C and every helper.
+// ============================================================================
+// 1. Config, text and data
+// ============================================================================
+const CHART = { width: 1080, height: 1350, fps: 30, duration: 15 };
+
+// DATA:BEGIN (written by tally.py; do not edit)
+const DATA = {"groups": [{"key": "gitzig-protocol", "task": "gitzig", "kit": "structured", "claude": "sonnet", "single": {"model": "sol", "n": 10, "gaps": [-0.4396, 6.4854, -3.7444, -12.3746, 4.772, -0.4957, 6.3785, 0.1613, 4.9993, -5.7423], "under_budget": [false, false, false, false, false, false, false, false, false, false], "tokens_M": [8.0, 8.044, 8.003, 8.002, 8.004, 8.007, 8.002, 8.004, 8.001, 8.023]}, "rows": [{"k": 2, "place": "above both", "mixed": {"gap": -22.7702, "n": 3}, "claude": {"gap": -26.6944, "n": 3}, "sol": {"gap": -31.363, "n": 3}}, {"k": 4, "place": "above both", "mixed": {"gap": -26.03, "n": 3}, "claude": {"gap": -34.779, "n": 3}, "sol": {"gap": -28.2837, "n": 3}}, {"k": 8, "place": "between", "mixed": {"gap": -48.7044, "n": 3}, "claude": {"gap": -54.1739, "n": 3}, "sol": {"gap": -40.3547, "n": 3}}]}, {"key": "gitzig-selforg", "task": "gitzig", "kit": "selforg", "claude": "sonnet", "single": {"model": "sol", "n": 10, "gaps": [-0.4396, 6.4854, -3.7444, -12.3746, 4.772, -0.4957, 6.3785, 0.1613, 4.9993, -5.7423], "under_budget": [false, false, false, false, false, false, false, false, false, false], "tokens_M": [8.0, 8.044, 8.003, 8.002, 8.004, 8.007, 8.002, 8.004, 8.001, 8.023]}, "rows": [{"k": 2, "place": "between", "mixed": {"gap": -3.1953, "n": 3}, "claude": {"gap": -20.7634, "n": 3}, "sol": {"gap": 1.9544, "n": 10}}, {"k": 4, "place": "between", "mixed": {"gap": -14.0591, "n": 3}, "claude": {"gap": -30.7454, "n": 3}, "sol": {"gap": -0.3004, "n": 10}}, {"k": 8, "place": "between", "mixed": {"gap": -25.0134, "n": 3}, "claude": {"gap": -39.9914, "n": 3}, "sol": {"gap": 3.2814, "n": 10}}]}, {"key": "ahc014", "task": "ahc014", "kit": "structured", "claude": "opus", "single": {"model": "opus", "n": 3, "gaps": [1.118, -3.0146, 1.8966], "under_budget": [true, true, true], "tokens_M": [6.918, 3.647, 5.233]}, "rows": [{"k": 2, "place": "between", "mixed": {"gap": 1.9302, "n": 3}, "claude": {"gap": 2.6617, "n": 3}, "sol": {"gap": -7.4674, "n": 3}}, {"k": 4, "place": "between", "mixed": {"gap": -2.13, "n": 3}, "claude": {"gap": 0.0449, "n": 3}, "sol": {"gap": -10.8904, "n": 3}}, {"k": 8, "place": "between", "mixed": {"gap": -5.512, "n": 3}, "claude": {"gap": 0.2925, "n": 3}, "sol": {"gap": -15.5608, "n": 3}}]}, {"key": "perf", "task": "perf", "kit": "structured", "claude": "opus", "single": {"model": "sol", "n": 3, "gaps": [-2.4613, 0.7262, 1.8355], "under_budget": [false, false, false], "tokens_M": [8.001, 8.001, 8.006]}, "rows": [{"k": 2, "place": "below both", "mixed": {"gap": -0.036, "n": 3}, "claude": {"gap": 0.0361, "n": 3}, "sol": {"gap": 0.4345, "n": 3}}, {"k": 4, "place": "between", "mixed": {"gap": -1.5614, "n": 3}, "claude": {"gap": -0.9993, "n": 3}, "sol": {"gap": -2.2551, "n": 3}}, {"k": 8, "place": "above both", "mixed": {"gap": 1.9478, "n": 3}, "claude": {"gap": 0.0722, "n": 3}, "sol": {"gap": -1.9441, "n": 3}}]}], "checks": {"place_counts": {"between": 8, "above both": 3, "below both": 1}, "mixed_above_best_single": [["ahc014", 2, 1.9302], ["perf", 8, 1.9478]], "perm_p": [0.2, 0.2]}};
+// DATA:END
+
+const BEATS = {
+  scaffold: [0.0, 0],   // title, key, footnote, task names, row labels in ink, gridlines, ticks
+  context:  [0.4, 1.5], // each task's best single agent: its runs, its mean, then the dashed line at 0
+  others:   [2.3, 1.6], // the one-model teams, row by row: Claude-only and GPT-6.1 Sol-only, joined by a span
+  subject:  [4.3, 1.4], // the mixed teams, row by row
+  callout:  [6.1, 0.8], // the two mixed teams above the best single agent, named with their gap
+};
+
+// ============================================================================
+// 3. The chart. draw(t) depends only on t.
+// ============================================================================
+const G = Object.fromEntries(DATA.groups.map((g) => [g.key, g]));
+const PANELS = [
+  { name: TASK.gitzig, claude: 'sonnet', groups: ['gitzig-protocol', 'gitzig-selforg'] },
+  { name: TASK.ahc014, claude: 'opus', groups: ['ahc014'] },
+  { name: TASK.takehome, claude: 'opus', groups: ['perf'] },
+];
+const SETUP_OF = { 'gitzig-protocol': 'structured', 'gitzig-selforg': 'selforg', ahc014: 'structured', perf: 'structured' };
+const ROWS = PANELS.flatMap((p) => p.groups.flatMap((key) => G[key].rows.map((r) => ({ ...r, key, kit: G[key].kit }))));
+const ABOVE = ROWS.filter((r) => r.mixed.gap > 0);
+const MAXGAP = Math.max(...ROWS.map((r) => r.mixed.gap));
+const TOK = G.ahc014.single.tokens_M;
+const PLACES = ['between', 'above both', 'below both'].map((p) => ROWS.filter((r) => r.place === p).length);
+
+const pct = (v, dp = 0) => `${v < 0 ? '−' : v > 0 ? '+' : ''}${fmt(Math.abs(v), { dp })}%`;
+// checks against the tally
+console.assert(ROWS.length === 12, 'twelve mixed teams');
+console.assert(ABOVE.length === 2 && ABOVE.every((r) => pct(r.mixed.gap, 1) === pct(MAXGAP, 1)), 'the footnote names two gaps of the same size');
+console.assert(ROWS.every((r) => r.kit === SETUP_OF[r.key]), 'setup colors');
+console.assert(JSON.stringify(ABOVE.map((r) => [r.key, r.k, r.mixed.gap])) === JSON.stringify(DATA.checks.mixed_above_best_single), 'mixed teams above the best single agent');
+console.assert(PLACES.join() === [DATA.checks.place_counts.between, DATA.checks.place_counts['above both'], DATA.checks.place_counts['below both']].join(), 'between counts');
+console.assert(ROWS.every((r) => { const lo = Math.min(r.claude.gap, r.sol.gap), hi = Math.max(r.claude.gap, r.sol.gap);
+  return r.place === (r.mixed.gap > hi ? 'above both' : r.mixed.gap < lo ? 'below both' : 'between'); }), 'places');
+console.assert(G.ahc014.single.under_budget.every(Boolean) && !G['gitzig-protocol'].single.under_budget.some(Boolean)
+  && !G.perf.single.under_budget.some(Boolean), 'only the AHC014 single agent is under budget');
+console.assert(G['gitzig-protocol'].single.gaps.join() === G['gitzig-selforg'].single.gaps.join(), 'one git-to-zig single agent');
+logTable(ROWS.map((r) => ({ group: r.key, k: r.k, claude: r.claude.gap, sol: r.sol.gap, mixed: r.mixed.gap, place: r.place,
+  n: [r.mixed.n, r.claude.n, r.sol.n].join('/') })), 'gap to the best single agent, % (mixed / Claude-only / Sol-only n)');
+logTable(PANELS.map((p) => { const s = G[p.groups[0]].single; return { task: p.name, single: s.model, n: s.n,
+  runs: s.gaps.map((v) => v.toFixed(1)).join(' '), tokens_M: s.tokens_M.join(' ') }; }), 'best single agent');
+logTable([{ max_mixed_gap: MAXGAP, title_pct: Math.ceil(MAXGAP), between: PLACES[0], above_both: PLACES[1], below_both: PLACES[2],
+  perm_p: DATA.checks.perm_p.join(' ') }], 'summary');
+
+const M = (v) => `${fmt(v, { dp: 1 })}M`;
+const TEXT = {
+  title: `Mixed teams scored between their Claude-only and GPT-6.1 Sol-only teams in ${PLACES[0]} of ${ROWS.length} cases`,
+  titleHTML: `Mixed teams scored between their <span class="nb">Claude-only</span> and <span class="nb">GPT-6.1 Sol-only</span> teams in ${PLACES[0]} of ${ROWS.length} cases`,
+  key: [{ shape: 'square', label: 'Claude-only team' }, { shape: 'circle', label: 'GPT-6.1 Sol-only team' },
+    { shape: 'diamond', label: 'Mixed team' }],
+  footHTML: `Means of 3 to 10 runs at 8M weighted tokens. The two ${pct(MAXGAP, 1)} gaps are within the noise of 3 runs. `
+    + `Hollow: <span class="nb">${MODEL.opus.name}</span> runs that spent only <span class="nb">${M(Math.min(...TOK))} to ${M(Math.max(...TOK))}</span> of their 8M.`,
+};
+
+// ---- layout, computed once W and H are known
+let LAY = null;
+function layout() {
+  if (LAY && LAY.W === W && LAY.H === H) return LAY;
+  const L = { W, H, panels: [] };
+  L.top = 44;                                   // room for "Best single agent" above the line
+  L.ph = 46; L.sh = 34; L.gapP = 24; L.foot = 62;
+  const nSub = PANELS.reduce((a, p) => a + p.groups.length, 0);
+  const nRows = PANELS.length + ROWS.length;
+  L.rh = (H - L.top - L.foot - PANELS.length * L.ph - nSub * L.sh - (PANELS.length - 1) * L.gapP) / nRows;
+  L.x = linear(-60, 12, 170, W - 2);
+  let y = L.top;
+  for (const p of PANELS) {
+    const P = { ...p, headY: y + 30, subs: [] };
+    y += L.ph;
+    P.single = { cy: y + L.rh / 2 };
+    P.rowsTop = y;
+    y += L.rh;
+    for (const key of p.groups) {
+      const S = { key, headY: y + 25, rows: [] };
+      y += L.sh;
+      for (const r of G[key].rows) { S.rows.push({ ...r, key, kit: G[key].kit, cy: y + L.rh / 2 }); y += L.rh; }
+      P.subs.push(S);
+    }
+    P.rowsBot = y;
+    L.panels.push(P);
+    y += L.gapP;
+  }
+  L.bottom = y - L.gapP;
+  // the order rows enter in, top to bottom
+  L.order = L.panels.flatMap((P) => P.subs.flatMap((S) => S.rows));
+  return (LAY = L);
+}
+
+function draw(t) {
+  svg.replaceChildren();
+  svg.setAttribute('fill', C.ink);
+  const L = layout(), x = L.x, x0 = x(0);
+  const ticks = [-60, -40, -20, 0];
+
+  // scaffold: gridlines per task (so no line crosses a task name), ticks and axis title at the bottom
+  for (const P of L.panels) {
+    for (const S of P.subs) grid(svg, { axis: 'x', scale: x, values: ticks, from: S.rows[0].cy - L.rh / 2 + 4, to: S.rows[2].cy + L.rh / 2 - 4, label: false });
+  }
+  ticks.forEach((v) => h(svg, 'text', { class: 'tick', x: x(v), y: L.bottom + 26, 'text-anchor': 'middle' }, v ? pct(v) : '0'));
+  h(svg, 'text', { class: 'axis-title', x: W, y: L.bottom + 54, 'text-anchor': 'end' }, 'Score vs the best single agent (tests passed; AHC014 raw score per case; take-home speed)');
+
+  // context: the dashed line at the best single agent, top to bottom, once the first means have landed
+  const [c0, cd] = BEATS.context;
+  const lineU = prog(t, c0 + 0.75, cd - 0.75, ease.inOut);
+  refLine(svg, 'single', x0, L.top - 6, x0, L.bottom, lineU);
+  tag(svg, x0, L.top - 16, 'Best single agent', { setup: 'single', anchor: 'middle', opacity: fade(t, c0 + 0.9, 0.3) });
+
+  L.panels.forEach((P, pi) => {
+    // task name and its two models
+    h(svg, 'text', { x: 0, y: P.headY, 'font-size': TYPE.name, 'font-weight': 700, fill: C.ink }, P.name);
+    h(svg, 'text', { x: measure(P.name, TYPE.name, 700) + 14, y: P.headY, 'font-size': TYPE.tick + 1, fill: C.muted },
+      `${MODEL[P.claude].name} and GPT-6.1 Sol`);
+
+    // the best single agent's runs (the dashed line is their mean)
+    const g = G[P.groups[0]], s = g.single, cy = P.single.cy, kind = MODEL[s.model].shape;
+    const ps = c0 + pi * 0.25;
+    setupName(svg, { y: cy + 8, setup: 'single', name: 'Single agent', note: `${MODEL[s.model].name}, each run${s.under_budget.every(Boolean) ? ', under budget' : ''}`, t, start: ps,
+      size: TYPE.label, noteSize: TYPE.tick + 1, gap: 12 });
+    const order = s.gaps.map((v, i) => i).sort((a, b) => s.gaps[a] - s.gaps[b]);
+    order.forEach((i, j) => run(svg, 'single', x(s.gaps[i]), cy, prog(t, ps + (j / s.gaps.length) * 0.4, MOTION.pop),
+      { shape: kind, hollow: s.under_budget[i] }));
+
+    for (const S of P.subs) {
+      const kit = G[S.key].kit, first = L.order.indexOf(S.rows[0]);
+      const [o0, od] = BEATS.others, step = (od - 0.5) / (L.order.length - 1);
+      setupName(svg, { y: S.headY, setup: kit, t, start: o0 + first * step, size: TYPE.label });
+      for (const r of S.rows) {
+        const i = L.order.indexOf(r), cy = r.cy;
+        h(svg, 'text', { x: 20, y: cy + 7, 'font-size': TYPE.tick + 1, fill: C.muted }, `${r.k} agents`);
+        // one-model teams: both ends pop, then the span between them draws out from the Claude-only end
+        const s0 = o0 + i * step, uA = prog(t, s0, MOTION.pop), uSpan = prog(t, s0 + 0.12, 0.35, ease.inOut);
+        const xa = x(r.claude.gap), xb = x(r.sol.gap);
+        if (uSpan > 0) h(svg, 'line', { x1: xa, x2: lerp(xa, xb, uSpan), y1: cy, y2: cy, stroke: SETUP[kit].tint,
+          'stroke-width': 5, 'stroke-linecap': 'round' });
+        if (uA > 0) {
+          shape(svg, 'square', xa, cy, 8 * uA, { fill: SETUP[kit].fill, stroke: C.bg, 'stroke-width': 1.5 });
+          shape(svg, 'circle', xb, cy, 8 * uA, { fill: SETUP[kit].fill, stroke: C.bg, 'stroke-width': 1.5 });
+        }
+        // the mixed team
+        const [m0, md] = BEATS.subject, uM = prog(t, m0 + i * ((md - 0.3) / (L.order.length - 1)), 0.3);
+        if (uM > 0) shape(svg, 'diamond', x(r.mixed.gap), cy, 11 * uM, { fill: SETUP[kit].line, stroke: C.bg, 'stroke-width': 2.5 });
+      }
+    }
+  });
+
+  // callout: the mixed teams above the best single agent, named with their gap
+  const [k0, kd] = BEATS.callout;
+  ABOVE.forEach((r, j) => {
+    const R = L.order.find((q) => q.key === r.key && q.k === r.k);
+    callout(svg, [], prog(t, k0 + j * 0.25, kd - 0.25), { hero: pct(r.mixed.gap, 1), x: x(r.mixed.gap) + 18, y: R.cy + 11, anchor: 'start' });
+  });
+}
+
+boot();
+</script>
+</body>
+</html>

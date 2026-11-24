@@ -1,0 +1,12 @@
+diff --git a/codex-rs/core/src/context_manager/history.rs b/codex-rs/core/src/context_manager/history.rs
+index 38ef4a59c0..a5b095652c 100644
+--- a/codex-rs/core/src/context_manager/history.rs
++++ b/codex-rs/core/src/context_manager/history.rs
+@@ -945,7 +945,6 @@ impl ContextManager {
+             last_tokens.saturating_add(items_after_last_model_generated_tokens)
+         } else {
+             last_tokens
+-                .saturating_add(self.get_non_last_reasoning_items_tokens())
+                 .saturating_add(items_after_last_model_generated_tokens)
+         }
+     }

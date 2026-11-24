@@ -1,0 +1,15 @@
+# The ALE-Bench judge (scorer/judge.py): Python with the `ale_bench` package at the pinned
+# commit (its src/, copied into the build context by `python ale_bench_task.py images`)
+# and its dependencies at the versions of upstream's uv.lock. It starts ALE-Bench's own
+# containers through the host's Docker socket, as `ale_bench` does.
+FROM python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258
+
+# cairosvg (imported by ale_bench.utils) needs the cairo library.
+RUN apt-get update && apt-get install -y --no-install-recommends libcairo2 \
+    && rm -rf /var/lib/apt/lists/*
+COPY scorer-requirements.txt /tmp/scorer-requirements.txt
+RUN pip install --no-cache-dir -r /tmp/scorer-requirements.txt
+COPY ALE-Bench /opt/ALE-Bench
+# Importable under python3 -I, which ignores PYTHONPATH but reads site-packages .pth files.
+RUN echo /opt/ALE-Bench/src > "$(python3 -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')/ale_bench.pth" \
+    && python3 -I -c "import ale_bench, ale_bench.session, ale_bench.tool_wrappers.case_runner; print(ale_bench.__file__)"

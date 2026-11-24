@@ -1,0 +1,73 @@
+/* Raising the Roof chart kit: shared look for every animated chart in the post.
+   Rules and the color table: STYLE.md next to this file. Based on the method chart (../method).
+   Load in <head>:  <link rel="stylesheet" href="../_kit/kit.css">  (path relative to the chart). */
+
+@font-face {
+  font-family: 'Instrument Sans';
+  src: url('fonts/InstrumentSans.ttf') format('truetype');   /* relative to this file */
+  font-weight: 400 700;
+  font-stretch: 75% 100%;
+  font-display: block;
+}
+
+:root {
+  /* Neutrals. Every token here is read by kit.js into C.<name>. */
+  --bg: #ffffff;        /* page */
+  --ink: #1b1b1a;       /* title, row names before their beat, labels inside bars, callouts */
+  --muted: #6f6d66;     /* row notes, ticks, axis titles, footnote */
+  --faint: #a9a69e;     /* de-emphasized labels */
+  --grid: #ecebe6;      /* gridlines, empty tracks */
+  --axis: #b9b6ae;      /* baselines, leader lines, a reference with no setup (0, 100%, lambda = 1) */
+  --context: #bcb8ae;   /* bands and ranges that are not a setup (an outside estimate, a min-max range) */
+
+  /* Setups: one color each, in every chart. fill = bars, dots, areas; line = strokes up to 4 px,
+     mean dots, intervals, reference lines; text = the setup's name and values; tint = a variant
+     of the same setup (another build, another budget), always labeled. line and text are
+     mix(fill, ink, k) with the k of the method chart. */
+  --single: #8a867c;        --single-line: #63615a;        --single-text: #585650;        --single-tint: #b9b6b0;
+  --restarted: #2f8f7f;     --restarted-line: #2a7266;     --restarted-text: #28665c;     --restarted-tint: #82bcb2;
+  --structured: #8fa3be;    --structured-line: #667385;    --structured-text: #5b6674;    --structured-tint: #bcc8d8;
+  --selforg: #d4765a;       --selforg-line: #a65f4a;       --selforg-text: #935644;       --selforg-tint: #e5ad9c;
+  --orchestrated: #cdb894;  --orchestrated-line: #7d715d;  --orchestrated-text: #6b6251;  --orchestrated-tint: #e1d4bf;
+  --notalk: #6b5b95;        --notalk-line: #5b4e7c;        --notalk-text: #534870;        --notalk-tint: #a69dbf;
+}
+
+html, body { margin: 0; }
+body {
+  width: var(--w); height: var(--h); overflow: hidden; background: var(--bg); color: var(--ink);
+  font-family: 'Instrument Sans', system-ui, sans-serif; font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision;
+}
+
+/* Frame: 54 top, 44 right, 40 bottom, 60 left. Header, chart, footer stack in a column. */
+#frame { box-sizing: border-box; width: 100%; height: 100%; padding: 54px 44px 40px 60px; display: flex; flex-direction: column; }
+header { display: flex; gap: 16px; align-items: flex-start; }
+.mark { width: 38px; height: 38px; flex: none; margin-top: 1px; }
+.mark:empty { display: none; }
+.mark img, .mark svg { width: 100%; height: 100%; object-fit: contain; }
+h1 { margin: 0; font-size: 31px; font-weight: 600; line-height: 1.18; letter-spacing: -0.003em; text-wrap: balance; }
+.sub { margin-top: 5px; font-size: 22.5px; line-height: 1.3; color: var(--muted); text-wrap: pretty; }
+.sub:empty { display: none; }
+#lead { margin-top: 28px; font-size: 24px; line-height: 1.42; }
+#lead:empty { display: none; }
+#chart { position: relative; flex: 1; min-height: 0; margin-top: 30px; }
+#chart svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+footer { margin-top: 26px; font-size: 18.5px; line-height: 1.47; color: var(--muted); }
+footer:empty { display: none; }
+
+/* Legend key, only when direct labels can't do the job. kit.js builds it from TEXT.key. */
+.key { display: flex; flex-wrap: wrap; gap: 6px 26px; margin-top: 12px; font-size: 22px; line-height: 1.3; color: var(--ink); }
+.key:empty { display: none; }
+.key span { display: inline-flex; align-items: center; gap: 9px; white-space: nowrap; }
+.key svg { flex: none; overflow: visible; }
+
+/* SVG text. Classes set size and weight only; set fill from code (a CSS fill would beat fill=""). */
+.tick { font-size: 20px; fill: var(--muted); }
+.axis-title { font-size: 20px; fill: var(--muted); }
+.name { font-size: 27px; font-weight: 700; }
+.label { font-size: 23px; }
+.annot { font-size: 22px; }
+.val { font-size: 24px; font-weight: 700; }
+.hero { font-size: 31px; font-weight: 700; }
+
+#tc { position: fixed; right: 6px; bottom: 4px; font: 12px ui-monospace, monospace; color: #999; }

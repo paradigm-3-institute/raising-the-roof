@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Raising the Roof: all results</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Setup colors as in the post's figures. Type scale: 17 (titles), 15 (sections), 13 (body, tables), 12 (secondary).
+   Spacing scale: 4, 8, 12, 16, 24. */
+:root {
+  --bg: #ffffff; --ink: #1b1b1a; --muted: #6f6d66; --faint: #a9a69e; --grid: #ecebe6; --axis: #b9b6ae; --panel: #f7f6f2;
+  --hover: #f3f2ed; --line: #e3e1da;
+  --single: #8a867c; --single-line: #63615a; --single-text: #585650;
+  --restarted: #2f8f7f; --restarted-line: #2a7266; --restarted-text: #28665c;
+  --protocol: #8fa3be; --protocol-line: #667385; --protocol-text: #5b6674;
+  --selforg: #d4765a; --selforg-line: #a65f4a; --selforg-text: #935644;
+  --orchestrated: #cdb894; --orchestrated-line: #7d715d; --orchestrated-text: #6b6251;
+  --notalk: #6b5b95; --notalk-line: #5b4e7c; --notalk-text: #534870;
+  --navh: 34px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 13px/1.4 'Instrument Sans', system-ui, sans-serif; font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+a { color: inherit; text-underline-offset: 2px; }
+h1, h2, h3 { text-wrap: balance; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; border-radius: 2px; }
+.wrap { max-width: 1480px; margin: 0 auto; padding: 12px 16px 0; }
+header.top { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+header.top h1 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.005em; }
+.asof { color: var(--muted); font-size: 12px; }
+.bar { position: sticky; top: 0; z-index: 5; background: var(--bg); margin: 8px -16px 0; padding: 0 16px;
+  box-shadow: 0 1px 0 var(--axis); }
+nav.views { display: flex; gap: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+nav.views a { text-decoration: none; white-space: nowrap; padding: 8px 12px 7px; font-size: 13px; color: var(--muted);
+  border-bottom: 2px solid transparent; transition-property: color, border-color; transition-duration: 120ms; }
+nav.views a:hover { color: var(--ink); }
+nav.views a[aria-current="page"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); }
+.filters { margin: 8px 0 0; font-size: 12px; color: var(--muted); }
+.filters summary { display: none; }
+#fbody { display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: center; }
+.fgroup { display: inline-flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.fgroup > span { margin-right: 4px; }
+.chip-btn { font: inherit; font-size: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--ink);
+  border-radius: 999px; padding: 0 8px; line-height: 20px; cursor: pointer;
+  transition-property: background-color, border-color, color, transform; transition-duration: 120ms; }
+.chip-btn:hover { background: var(--hover); }
+.chip-btn:active { transform: scale(0.96); }
+.chip-btn[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+label.check { cursor: pointer; display: inline-flex; gap: 4px; align-items: center; color: var(--ink); }
+.vhead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 16px 0 0; }
+.vhead h2 { font-size: 17px; margin: 0; font-weight: 600; letter-spacing: -0.005em; }
+.backs { color: var(--muted); font-size: 12px; }
+.legend { font-size: 12px; color: var(--muted); margin: 4px 0 0; line-height: 1.6; max-width: 1180px; text-wrap: pretty; }
+.legend .mk { margin: 0 3px 0 0; }
+.legend .item { white-space: nowrap; margin-right: 6px; }
+.vnote { font-size: 12px; margin: 4px 0 0; color: var(--muted); max-width: 900px; text-wrap: pretty; }
+h3.bt { font-size: 15px; margin: 24px 0 0; font-weight: 600; }
+.tasks { display: flex; flex-wrap: wrap; gap: 0 18px; align-items: flex-start; }
+details.task { margin-top: 12px; flex: 0 1 auto; max-width: 100%; min-width: 0; }
+details.task.wide { flex-basis: 100%; }
+details.task > summary { cursor: pointer; padding: 2px 0 4px; font-size: 15px; font-weight: 600; list-style: none;
+  border-bottom: 1px solid var(--axis); }
+details.task > summary::-webkit-details-marker { display: none; }
+details.task > summary::before { content: '\25BE'; display: inline-block; width: 14px; color: var(--faint); font-size: 12px; }
+details.task:not([open]) > summary::before { content: '\25B8'; }
+details.task > summary .unit { font-weight: 400; color: var(--muted); font-size: 12px; margin-left: 8px; }
+section.budget { margin: 8px 0 8px; }
+section.budget, details.task, h3.bt { scroll-margin-top: calc(var(--navh) + 8px); }
+.cap { font-size: 12px; color: var(--muted); margin: 0 0 2px; }
+.cap b { color: var(--ink); font-weight: 600; }
+.gnote { font-size: 12px; color: var(--muted); margin: 4px 0 0; max-width: 760px; text-wrap: pretty; }
+table.g { border-collapse: separate; border-spacing: 0; font-size: 13px; line-height: 1.3; }
+table.g th { text-align: left; font-weight: 500; color: var(--muted); font-size: 12px; padding: 4px 4px 3px;
+  border-bottom: 1px solid var(--axis); white-space: nowrap; background: var(--bg);
+  position: sticky; top: var(--navh); z-index: 2; }
+table.g thead tr:nth-child(2) th { top: calc(var(--navh) + 21px); padding-top: 0; }
+table.g td { padding: 2px 4px 1px; border-bottom: 1px solid var(--grid); white-space: nowrap; vertical-align: baseline;
+  background: var(--bg); }
+table.g tr.mfirst > td { border-top: 1px solid var(--line); }
+table.g tbody tr:first-child > td { border-top: none; }
+table.g td.mn { font-weight: 600; vertical-align: top; padding-top: 3px; }
+table.g th.rc { color: var(--restarted-text); cursor: help; }
+table.g td.mn + td.c[rowspan] { vertical-align: top; padding-top: 3px; }
+table.g td.lab { font-weight: 600; }
+table.g td.sub { color: var(--muted); }
+td.c { cursor: pointer; transition-property: background-color; transition-duration: 100ms; }
+td.c:hover, td.c.open { background: var(--hover); }
+td.c.empty, td.c.filtered { cursor: default; background: var(--bg); }
+td.mn .sa, td.mn .sa0 { font-weight: 400; margin-top: 1px; }
+td.mn .sa { cursor: pointer; border-radius: 3px; margin-left: -3px; padding: 0 3px; transition-property: background-color; transition-duration: 100ms; }
+td.mn .sa:hover, td.mn .sa.open { background: var(--hover); }
+.v { display: inline-block; min-width: 2.9em; text-align: right; }
+.v.clear { font-weight: 700; }
+.v.nc { color: var(--muted); }
+.ci { color: var(--muted); font-size: 12px; }
+.iv { display: inline-block; min-width: 5.3em; padding-left: 2px; }
+.nn { color: var(--muted); font-size: 12px; margin-left: 4px; }
+td.mn .v { min-width: 0; text-align: left; }
+.mk { display: inline-block; font-size: 11px; line-height: 14px; font-weight: 600; color: var(--ink);
+  background: var(--grid); border-radius: 3px; padding: 0 2px; margin-left: 3px; letter-spacing: 0.02em; cursor: help;
+  vertical-align: 1px; }
+.na { color: var(--faint); }
+.sep { color: var(--faint); margin: 0 2px 0 6px; }
+#tip { position: fixed; z-index: 20; max-width: 320px; background: var(--bg); color: var(--ink); font-size: 12px;
+  line-height: 1.45; padding: 6px 8px; border-radius: 6px; pointer-events: none; white-space: pre-line;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.12); opacity: 0;
+  transition-property: opacity; transition-duration: 80ms; }
+#tip.on { opacity: 1; }
+.detail { background: var(--panel); border-radius: 8px; padding: 12px 16px; margin: 8px 0 4px; white-space: normal;
+  box-shadow: inset 0 0 0 1px var(--grid); }
+.dh { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.dh .t { font-size: 15px; font-weight: 600; }
+.dh .sub { color: var(--muted); font-size: 12px; flex: 1; }
+.close { font: inherit; font-size: 12px; border: 1px solid var(--line); background: var(--bg); border-radius: 999px;
+  padding: 0 10px; line-height: 20px; cursor: pointer; transition-property: background-color, transform; transition-duration: 120ms; }
+.close:hover { background: var(--hover); }
+.close:active { transform: scale(0.96); }
+.dstats { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 8px 24px; margin: 8px 0; }
+.dstats h4 { font-size: 12px; font-weight: 600; color: var(--muted); margin: 0 0 2px; }
+.dstats dl { display: grid; grid-template-columns: max-content 1fr; gap: 1px 12px; margin: 0; }
+.dstats dt { color: var(--muted); }
+.dstats dd { margin: 0; }
+.strips { margin: 8px 0; }
+.srow { display: grid; grid-template-columns: 140px 1fr; gap: 8px; align-items: center; height: 20px; }
+.srow .sl { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.track { position: relative; height: 20px; }
+.track::before { content: ''; position: absolute; left: 0; right: 0; top: 9px; border-top: 2px solid var(--grid); }
+.track .dot { position: absolute; top: 5px; width: 11px; height: 11px; border-radius: 50%; margin-left: -5.5px; }
+.track .mean { position: absolute; top: 3px; width: 15px; height: 15px; border-radius: 50%; margin-left: -7.5px;
+  border: 2.5px solid var(--panel); }
+.axis { display: flex; justify-content: space-between; margin-left: 148px; font-size: 12px; color: var(--muted); }
+.scroll { overflow: auto; max-width: 100%; }
+.scroll.tall { max-height: calc(100vh - 150px); border-top: 1px solid var(--axis); }
+table.r { border-collapse: separate; border-spacing: 0; font-size: 12px; width: 100%; }
+table.r th { text-align: left; font-weight: 500; color: var(--muted); border-bottom: 1px solid var(--axis);
+  padding: 4px 6px 3px; white-space: nowrap; background: var(--bg); position: sticky; top: 0; z-index: 2; }
+.detail table.r th { background: var(--panel); position: static; }
+table.r td { border-bottom: 1px solid var(--grid); padding: 2px 6px; vertical-align: baseline; background: var(--bg); }
+.detail table.r td { background: var(--panel); }
+table.r td.num, table.r th.num { text-align: right; white-space: nowrap; }
+table.r td.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px; white-space: nowrap; }
+.scroll.tall table.r td.mono, .scroll.tall table.r th:first-child { position: sticky; left: 0; z-index: 1; }
+.scroll.tall table.r th:first-child { z-index: 3; }
+table.r td.note { max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.scroll.tall table.r td { white-space: nowrap; }
+table.r td.cfg { max-width: 360px; overflow: hidden; text-overflow: ellipsis; }
+table.r tr.out td { color: var(--muted); }
+table.r tr.sep td { font-weight: 600; color: var(--ink); padding-top: 8px; }
+.chip { font-size: 11px; line-height: 15px; background: var(--grid); border-radius: 3px; padding: 0 4px; color: var(--ink);
+  white-space: nowrap; display: inline-block; margin: 0 2px 1px 0; }
+.chip.q { background: transparent; color: var(--muted); box-shadow: inset 0 0 0 1px var(--line); }
+.counts { display: flex; flex-wrap: wrap; gap: 4px 24px; margin: 16px 0 4px; color: var(--muted); }
+.counts b { font-size: 15px; color: var(--ink); font-weight: 600; margin-right: 4px; }
+h3.qh { font-size: 15px; font-weight: 600; margin: 24px 0 4px; }
+table.q { border-collapse: collapse; font-size: 13px; }
+table.q td { padding: 3px 16px 3px 0; border-bottom: 1px solid var(--grid); white-space: nowrap; vertical-align: baseline; }
+table.q td.num { text-align: right; }
+table.q td.m { color: var(--muted); white-space: normal; font-size: 12px; }
+table.q a { font-weight: 600; text-decoration: none; }
+table.q a:hover { text-decoration: underline; }
+.search { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin: 8px 0; font-size: 12px; color: var(--muted); }
+input[type=search] { font: inherit; font-size: 13px; padding: 3px 8px; border: 1px solid var(--line); border-radius: 6px;
+  width: min(340px, 100%); }
+footer { margin: 32px -16px 0; padding: 12px 16px 24px; border-top: 1px solid var(--axis); font-size: 12px; color: var(--muted);
+  display: flex; flex-wrap: wrap; gap: 4px 24px; }
+footer .method { flex: 1 1 520px; text-wrap: pretty; }
+footer a { color: var(--ink); }
+details.key { flex-basis: 100%; }
+details.key summary { cursor: pointer; color: var(--ink); }
+details.key dl { display: grid; grid-template-columns: 160px 1fr; gap: 2px 12px; margin: 8px 0 0; }
+details.key dt { font-weight: 600; color: var(--ink); }
+details.key dd { margin: 0; }
+@media (max-width: 1199px) { .tasks { display: block; } .tbl { overflow-x: auto; }
+  .tbl table.g th { position: static; } .tbl td.mn { position: sticky; left: 0; z-index: 1; } }
+@media (max-width: 600px) {
+  .wrap { padding: 8px 16px 0; }
+  .bar { margin: 8px -16px 0; padding: 0 16px; }
+  footer { margin: 24px -16px 0; padding: 12px 16px; }
+  .filters summary { display: block; cursor: pointer; color: var(--ink); font-weight: 600; padding: 4px 0; }
+  .tbl { overflow: visible; }
+  table.g, table.g tbody, table.g tr, table.g td { display: block; }
+  table.g { width: 100%; }
+  table.g thead { display: none; }
+  table.g tr { border-bottom: 1px solid var(--grid); padding: 2px 0; }
+  table.g tr.mfirst { border-top: 1px solid var(--line); margin-top: 4px; }
+  table.g td { border: none !important; padding: 1px 2px; white-space: normal; position: static !important; }
+  table.g td.mn { font-size: 13px; padding-top: 4px; }
+  table.g td.c { display: inline-block; width: 50%; white-space: nowrap; vertical-align: top; }
+  table.g td.c::before { content: attr(data-col); display: block; color: var(--muted); font-size: 12px; line-height: 1.2; }
+  table.g td.c.filtered, table.g td.c.empty { display: none; }
+  table.g td.sub { display: inline; }
+  table.g td.lab { display: block; }
+  table.q, table.q tbody, table.q tr { display: block; width: 100%; }
+  table.q tr { padding: 4px 0; border-bottom: 1px solid var(--grid); }
+  table.q td { display: inline; white-space: normal; border: none; padding: 0 8px 0 0; }
+  table.q td:first-child { display: block; }
+  .v { min-width: 0; text-align: left; }
+  .iv { min-width: 0; }
+  .srow { grid-template-columns: 90px 1fr; }
+  .axis { margin-left: 98px; }
+  details.key dl { grid-template-columns: 1fr; }
+  table.q td.m { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top"><h1>Raising the Roof: all results</h1><div class="asof" id="asof"></div></header>
+  <div class="bar" id="bar"><nav class="views" id="nav" aria-label="Views"></nav></div>
+  <details class="filters" id="filters" open><summary>Filters</summary><div id="fbody"></div></details>
+  <main id="main"></main>
+  <footer><span id="fasof"></span><span class="method">Each cell compares a configuration with its reference, normally the same model's single agent at the same total budget of weighted tokens. Intervals are bootstrap 95%. A comparison is not counted when the reference spent under 85% of its budget.</span><span>Download <a href="#" data-dl="runs">runs.csv</a> · <a href="#" data-dl="configs">configs.csv</a></span><details class="key"><summary>How to read this page</summary><div id="key"></div></details></footer>
+</div>
+<div id="tip" role="tooltip"></div>
+<script>
+const P = /*PAYLOAD*/null;
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+function parseCSV(text) {   // RFC 4180: quoted fields may hold commas, quotes and newlines
+  const rows = []; let row = [], f = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) {
+      if (ch === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else q = false; } else f += ch;
+    } else if (ch === '"') q = true;
+    else if (ch === ',') { row.push(f); f = ''; }
+    else if (ch === '\n') { row.push(f.replace(/\r$/, '')); rows.push(row); row = []; f = ''; }
+    else f += ch;
+  }
+  if (f !== '' || row.length) { row.push(f); rows.push(row); }
+  const head = rows.shift();
+  return rows.map(v => Object.fromEntries(head.map((h, i) => [h, v[i] ?? ''])));
+}
+const RUNS = parseCSV(P.runsCSV), CFG = parseCSV(P.configsCSV);
+RUNS.forEach((r, i) => { r.cell = P.runCell[i]; });
+const CAT = Object.fromEntries(CFG.map(c => [c.id, c]));
+const BYCELL = {};
+RUNS.forEach(r => { (BYCELL[r.cell] = BYCELL[r.cell] || []).push(r); });
+const N = P.names, FLAGS = P.flags, VIEWS = P.views;
+const num = v => (v === '' || v === null || v === undefined) ? null : +v;
+const MINUS = '−';
+const sgn = (x, d = 0) => { const s = Math.abs(x).toFixed(d); return (+s === 0 ? '' : x > 0 ? '+' : MINUS) + s; };
+const COLOR = {solo: 'single', solo_ttc: 'single', relay: 'restarted', relayctx: 'restarted', ttc: 'protocol',
+  board: 'selforg', peers: 'selforg', chat: 'selforg', ultra: 'orchestrated', notalk: 'notalk'};
+const GROUP = {solo: 'single', solo_ttc: 'single', relay: 'restarted', relayctx: 'single', ttc: 'protocol',
+  board: 'selforg', peers: 'selforg', chat: 'selforg', ultra: 'orchestrated', notalk: 'notalk'};
+const GROUP_NAME = {single: 'Single agent', restarted: 'Restarted single agent', protocol: 'Protocol teams',
+  selforg: 'Self-organized teams', orchestrated: 'Orchestrated teams', notalk: 'No-talk teams'};
+const CHANNEL = {board: 'message board', peers: 'direct messages', chat: 'SwarmChat'};
+const MODEL_ORDER = ['opus', 'sonnet', 'sol', 'terra', 'opus5', 'sonnet5', 'terra56', 'sol62', 'mixed', 'opussol'];
+const MODEL_LABEL = m => (m === 'mixed' || m === 'opussol') ? 'Mixed teams' : (N.model[m] || m);
+const css = v => getComputedStyle(document.documentElement).getPropertyValue('--' + v).trim();
+// flag marks shown in cells (letter, flag key); the other flags are listed in the cell details
+const MARKS = [['T', 'time-cap'], ['G', 'gave-up'], ['U', 'under-budget'], ['X', 'failed'], ['F', 'content-filter'],
+  ['I', 'in-run-grade'], ['R', 'regraded'], ['S', 'slow-judge'], ['C', 'at-ceiling']];
+const ATTN = MARKS.map(m => m[1]);
+const RELAY_TIP = 'Restarted single agent: one agent whose budget is split into 8 sessions run one after another, each starting fresh with the same files. Compared with the single agent, like the teams.';
+const ROW_TIP = {
+  relay: 'One agent with the whole budget, run as 8 sessions one after another, each with a fresh context but the same files.',
+  board: 'GPT agents talk on a shared message board.', peers: 'Claude agents send each other direct messages.',
+  chat: 'Mixed teams share a SwarmChat chat.', ttc: 'Agents follow a fixed protocol prompt.',
+  ultra: 'One orchestrator agent starts helper agents (Codex multi-agent mode).'};
+
+// ---------------------------------------------------------------- names and numbers
+function cfgName(c) {   // a configuration row or a run row
+  if (!c) return '';
+  const k = +c.team_size, m = N.model[c.model] || c.model;
+  let s;
+  if (c.setup === 'solo') s = 'Single agent' + (c.variant ? ', ' + c.variant : '');
+  else if (c.setup === 'solo_ttc') s = 'Single agent, protocol prompt';
+  else if (c.setup === 'relay') s = `Restarted single agent, ${k} sessions`;
+  else if (c.setup === 'relayctx') s = N.setup.relayctx;
+  else if (c.setup === 'notalk') s = `No-talk team, best of ${k}, ${c.variant}`;
+  else s = `${N.setup[c.setup]}, ${k} agents` + (CHANNEL[c.setup] ? ` (${CHANNEL[c.setup]})` : '');
+  if (c.series === 'rerun') s += ', patched-build rerun';
+  return `${m}, ${s}, ${N.task[c.task]}, ${+c.budget_M}M`;
+}
+function score(task, v, d) {
+  v = num(v); if (v === null) return '';
+  if (task === 'gitzig') return v.toFixed(d ?? 1) + '%';
+  return Math.round(v).toLocaleString('en-US');
+}
+function scoreCI(task, lo, hi) {
+  if (num(lo) === null) return '';
+  return `[${score(task, lo).replace('%', '')}, ${score(task, hi).replace('%', '')}]`;
+}
+const pct = (g, d = 0) => num(g) === null ? '' : sgn(+g, d) + '%';
+const pctCI = (lo, hi, d = 0) => num(lo) === null ? '' : `[${sgn(+lo, d)}, ${sgn(+hi, d)}]`;
+
+// ---------------------------------------------------------------- filters
+const F = {models: new Set(), groups: new Set(), sizes: new Set(), all: false};
+function passes(c) {   // a configuration row or a run row
+  if (!c) return false;
+  if (F.models.size && !F.models.has(c.model === 'opussol' ? 'mixed' : c.model)) return false;
+  if (F.groups.size && !F.groups.has(GROUP[c.setup])) return false;
+  if (F.sizes.size && !F.sizes.has(String(+c.team_size))) return false;
+  return true;
+}
+function entryCells(e) {
+  if (!e) return [];
+  if (e.show === 'pair') return [e.team, e.notalk].filter(Boolean).map(x => CAT[x.cell]);
+  if (e.show === 'change') return [];
+  return [CAT[e.cell]];
+}
+const entryPasses = e => e && (e.show === 'change' ? true : entryCells(e).some(passes));
+
+// ---------------------------------------------------------------- one-line cells
+function counts(c) {
+  const o = {};
+  (c.flag_counts || '').split(' ').filter(Boolean).forEach(it => { const [k, v] = it.split(':'); o[k] = +v; });
+  return o;
+}
+function marks(c, e) {   // one small box of letters; the tooltip names them with counts
+  const o = counts(c), n = +c.n, codes = [], tips = [];
+  MARKS.forEach(([code, k]) => { if (o[k]) { codes.push(code); tips.push(`${code}: ${o[k]} of ${n} ${FLAGS[k].label}` + (k === 'under-budget' && num(c.spend_share) !== null ? ` (spent ${Math.round(100 * c.spend_share)}% on average)` : '')); } });
+  if (e && e.build) { codes.push('B'); tips.push('B: ' + e.build); }
+  return codes.length ? `<span class="mk" data-tip="${esc(tips.join('\n'))}">${codes.join('')}</span>` : '';
+}
+function nMark(c, usualN) {
+  if (c.setup === 'notalk') return +c.n === usualN ? '' : `<span class="nn">pool ${c.n}</span>`;
+  return +c.n === usualN ? '' : `<span class="nn">n${c.n}</span>`;
+}
+function valueHTML(e, usualN, mode) {   // mode overrides e.show (used for reference cells)
+  const c = CAT[e.cell], task = c.task, show = mode || e.show;
+  let h = '';
+  if (show === 'abs' || show === 'abs+gap') {
+    h += `<span class="v">${score(task, c.mean)}</span>`;
+    if (task === 'ahc014' && num(c.raw_mean_M) !== null) h += ` <span class="ci" data-tip="raw private score per case, in millions">${(+c.raw_mean_M).toFixed(3)}M</span>`;
+    else if (show === 'abs') h += `<span class="ci iv">${scoreCI(task, c.ci_lo, c.ci_hi)}</span>`;
+    if (show === 'abs+gap') h += '<span class="sep">·</span>';
+  }
+  if (show === 'gap' || show === 'abs+gap') {
+    if (e.gap_pct === undefined) h += '<span class="na" data-tip="The reference has no counted runs">–</span>';
+    else {
+      const nc = e.counted === false;
+      const cls = nc ? 'nc' : (e.clear === 'above' || e.clear === 'below') ? 'clear' : '';
+      h += `<span class="v ${cls}"${nc ? ' data-tip="Not counted: the reference spent under 85% of its budget"' : ''}>${pct(e.gap_pct)}${nc ? '*' : ''}</span><span class="ci iv">${pctCI(e.gap_lo, e.gap_hi)}</span>`;
+    }
+  }
+  return h + nMark(c, usualN) + marks(c, e);
+}
+function changeHTML(e) {
+  if (e.change === undefined || e.change === null) return '';
+  const pts = e.change_kind !== 'score';
+  return `<span class="v">${sgn(+e.change)}${pts ? ' pts' : '%'}</span><span class="ci iv">${pctCI(e.change_lo, e.change_hi)}</span>`;
+}
+
+// ---------------------------------------------------------------- grids
+let OPEN = null;
+function usualN(g) {
+  const ns = {};
+  g.rows.forEach(r => Object.values(r.cells).forEach(e => entryCells(e).forEach(c => {
+    if (c && c.setup !== 'notalk') ns[c.n] = (ns[c.n] || 0) + 1; })));
+  const best = Object.entries(ns).sort((a, b) => b[1] - a[1])[0];
+  return best ? +best[0] : 0;
+}
+function td(e, id, col, usual) {
+  if (!e || !entryPasses(e)) return `<td class="c ${e ? 'filtered' : 'empty'}" data-col="${esc(col)}"></td>`;
+  const inner = e.show === 'change' ? changeHTML(e) : valueHTML(e, usual);
+  const click = e.show !== 'change' ? ` data-a="${esc(id)}" tabindex="0" role="button"` : '';
+  return `<td class="c${OPEN === id ? ' open' : ''}" data-col="${esc(col)}"${click}>${inner}</td>`;
+}
+function caption(bu, g, usual, what) {
+  const parts = [`<b>${what ? esc(what) + ', ' : ''}${bu.budget}M weighted tokens</b>`];
+  if (usual) parts.push(`n = ${usual} unless marked`);
+  if (g.ref) {
+    const c = CAT[g.ref.cell];
+    parts.push(`reference: ${esc(g.ref.label)} ${score(c.task, c.mean)}` + (+c.n !== usual ? ` (n ${c.n})` : '') +
+      (g.ref.under ? ` (spent ${Math.round(100 * c.spend_share)}%; gaps marked * not counted)` : ''));
+  }
+  return `<div class="cap">${parts.join(' · ')}</div>`;
+}
+const poolN = e => P.pool[+CAT[e.cell].team_size] || 0;
+function modelGridHTML(bu) {
+  const g = bu.grid, usual = usualN(g);
+  const pair = g.rows.some(r => Object.values(r.cells).some(e => e && e.show === 'pair'));
+  const order = [], by = {};
+  g.rows.forEach(r => {
+    if (!by[r.model]) { by[r.model] = {solo: null, relay: null, rows: []}; order.push(r.model); }
+    const keys = Object.keys(r.cells);
+    if (r.setup === 'solo' && keys.every(k => k === '1')) by[r.model].solo = r;
+    else if (r.setup === 'relay' && keys.every(k => k === '1x8')) by[r.model].relay = r;   // one agent: its own column
+    else by[r.model].rows.push(r);
+  });
+  const sizeCols = g.cols.filter(c => c.key !== '1' && c.key !== '1x8');
+  const vis = r => Object.values(r.cells).some(entryPasses);
+  const relayOk = b => b.relay && entryPasses(b.relay.cells['1x8']);
+  const blocks = order.map(m => ({m, solo: by[m].solo, relay: by[m].relay, rows: by[m].rows.filter(vis)}))
+    .filter(b => b.rows.length || (b.solo && entryPasses(b.solo.cells['1'])) || relayOk(b));
+  if (!blocks.length) return '';
+  const cols = sizeCols.filter(col => blocks.some(b => b.rows.some(r => entryPasses(r.cells[col.key]))));
+  const relayCol = !pair && blocks.some(relayOk);
+  const relayLabel = (g.cols.find(c => c.key === '1x8') || {}).label || '';
+  const teams = blocks.some(b => b.rows.length);
+  let h = caption(bu, g, usual) + `<div class="tbl"><table class="g"><thead><tr><th>Model, single agent</th>${relayCol ? `<th class="rc" data-tip="${esc(RELAY_TIP)}">${esc(relayLabel)}</th>` : ''}${teams ? '<th>Setup</th>' : ''}`;
+  if (pair) {
+    h += cols.map(c => `<th colspan="2">${esc(c.label)}</th>`).join('') + '</tr><tr><th></th><th></th>' +
+      cols.map(() => '<th>Talking</th><th>No-talk</th>').join('');
+  } else h += cols.map(c => `<th>${esc(c.label)}</th>`).join('');
+  h += '</tr></thead><tbody>';
+  blocks.forEach(b => {
+    const span = Math.max(1, b.rows.length);
+    let sa = '';
+    if (b.solo && entryPasses(b.solo.cells['1'])) {
+      const id = `${g.anchor}/${b.solo.slug}/1`;
+      sa = `<div class="sa${OPEN === id ? ' open' : ''}" data-a="${esc(id)}" tabindex="0" role="button" data-tip="Single agent at the same budget: open its runs">${valueHTML(b.solo.cells['1'], usual)}</div>`;
+    } else if (!b.solo) {
+      const ref = b.rows.map(r => Object.values(r.cells).map(e => e && (e.show === 'pair' ? (e.team || e.notalk) : e)).find(x => x && x.ref)).find(Boolean);
+      if (ref) sa = `<div class="sa0">${valueHTML({cell: ref.ref, show: 'abs'}, usual, 'abs')}</div>`;
+    }
+    let modelTd = `<td class="mn" rowspan="${span}">${esc(MODEL_LABEL(b.m))}${sa}</td>`;
+    if (relayCol) modelTd += relayOk(b)
+      ? td(b.relay.cells['1x8'], `${g.anchor}/${b.relay.slug}/1x8`, relayLabel, usual).replace('<td ', `<td rowspan="${span}" `)
+      : `<td class="c empty" rowspan="${span}" data-col="${esc(relayLabel)}"></td>`;
+    const rows = b.rows.length ? b.rows : [null];
+    rows.forEach((r, i) => {
+      h += `<tr${i === 0 ? ' class="mfirst"' : ''}>`;
+      if (i === 0) h += modelTd;
+      if (!r) { h += `${teams ? '<td class="lab"></td>' : ''}${cols.map(() => pair ? '<td></td><td></td>' : '<td></td>').join('')}</tr>`; return; }
+      h += `<td class="lab" style="color:${css((COLOR[r.setup] || 'single') + '-text')}" data-tip="${esc(ROW_TIP[r.setup] || '')}">${esc(r.label)}</td>`;
+      cols.forEach(col => {
+        const e = r.cells[col.key], id = `${g.anchor}/${r.slug}/${col.key}`;
+        if (pair) {
+          const t = e && e.team && passes(CAT[e.team.cell]) ? valueHTML(e.team, usual) : '';
+          const nt = e && e.notalk && passes(CAT[e.notalk.cell]) ? valueHTML(e.notalk, poolN(e.notalk)) : '';
+          const click = e ? ` data-a="${esc(id)}" tabindex="0" role="button"` : '';
+          const o = OPEN === id ? ' open' : '';
+          h += `<td class="c${o}${t ? '' : ' empty'}" data-col="${esc(col.label)}, talking"${t ? click : ''}>${t}</td><td class="c${o}${nt ? '' : ' empty'}" data-col="${esc(col.label)}, no-talk"${nt ? click : ''}>${nt || (e && e.team ? '<span class="na" data-tip="No no-talk pool was run for this team size">–</span>' : '')}</td>`;
+        } else h += td(e, id, col.label, usual);
+      });
+      h += '</tr>';
+    });
+  });
+  h += '</tbody></table></div>';
+  if (g.note) h += `<p class="gnote">${esc(g.note)}</p>`;
+  return h;
+}
+function genericGridHTML(bu) {
+  const g = bu.grid, usual = usualN(g);
+  const rows = g.rows.filter(r => Object.values(r.cells).some(entryPasses));
+  if (!rows.length) return '';
+  const cols = g.cols.filter(col => rows.some(r => entryPasses(r.cells[col.key])));
+  const sizeSub = r => /^\d+ agents/.test(r.sub || '') ? r.sub.split(' · ')[0] : '';
+  const hasSub = rows.some(r => sizeSub(r));
+  const multi = new Set(rows.map(r => r.model)).size > 1;
+  const shared = multi && new Set(rows.map(r => r.label + '|' + (r.sub || ''))).size === 1 ? rows[0] : null;
+  const run = (i, same) => { let n = 1; while (rows[i + n] && same(rows[i + n], rows[i])) n++; return n; };
+  let h = caption(bu, g, usual, shared ? shared.label + (sizeSub(shared) ? ', ' + sizeSub(shared) : '') : '') + `<div class="tbl"><table class="g"><thead><tr>${multi ? '<th>Model</th>' : ''}${shared ? '' : '<th></th>'}${hasSub && !shared ? '<th></th>' : ''}${cols.map(c => `<th>${esc(c.label)}</th>`).join('')}</tr></thead><tbody>`;
+  rows.forEach((r, i) => {
+    const newModel = multi && (i === 0 || rows[i - 1].model !== r.model);
+    const newLabel = newModel || i === 0 || rows[i - 1].label !== r.label;
+    h += `<tr${newLabel ? ' class="mfirst"' : ''}>`;
+    if (newModel) h += `<td class="mn" rowspan="${run(i, (a, b) => a.model === b.model)}">${esc(MODEL_LABEL(r.model))}</td>`;
+    if (newLabel && !shared) {
+      const span = run(i, (a, b) => a.label === b.label && a.model === b.model);
+      const tip = [ROW_TIP[r.setup], (r.sub || '').split(' · ').slice(1).join(' · ')].filter(Boolean).join(' ');
+      h += `<td class="lab" rowspan="${span}" style="color:${css((COLOR[r.setup] || 'single') + '-text')}" data-tip="${esc(tip)}">${esc(r.label)}</td>`;
+    }
+    if (hasSub && !shared) h += `<td class="sub">${esc(sizeSub(r))}</td>`;
+    cols.forEach(col => { h += td(r.cells[col.key], `${g.anchor}/${r.slug}/${col.key}`, col.label, usual); });
+    h += '</tr>';
+  });
+  h += '</tbody></table></div>';
+  if (g.note) h += `<p class="gnote">${esc(g.note)}</p>`;
+  return h;
+}
+function findCell(anchor) {
+  for (const v of VIEWS) for (const b of v.blocks) for (const t of b.tasks) for (const bu of t.budgets) {
+    const g = bu.grid;
+    if (!anchor.startsWith(g.anchor + '/')) continue;
+    const rest = anchor.slice(g.anchor.length + 1), cut = rest.lastIndexOf('/');
+    const r = g.rows.find(r => r.slug === rest.slice(0, cut));
+    if (r && r.cells[rest.slice(cut + 1)]) return {v, g, r, e: r.cells[rest.slice(cut + 1)], col: rest.slice(cut + 1)};
+  }
+  return null;
+}
+
+// ---------------------------------------------------------------- detail panel
+function strip(task, sets) {
+  const vals = [];
+  sets.forEach(s => s.runs.forEach(r => vals.push(+r.final)));
+  if (!vals.length) return '';
+  let lo = Math.min(...vals), hi = Math.max(...vals);
+  const pad = (hi - lo) * 0.06 || Math.abs(hi) * 0.02 || 1; lo -= pad; hi += pad;
+  const rev = task === 'perf';
+  const x = v => 100 * (rev ? (hi - v) / (hi - lo) : (v - lo) / (hi - lo));
+  let h = '<div class="strips">';
+  sets.forEach(s => {
+    const col = COLOR[s.cell.setup] || 'single', fill = css(col), line = css(col + '-line');
+    h += `<div class="srow"><div class="sl" data-tip="${esc(s.label)}">${esc(s.label)}</div><div class="track">`;
+    s.runs.forEach(r => {
+      const hollow = /under-budget|time-cap/.test(r.flags);
+      h += `<span class="dot" data-tip="${esc(r.run)}: ${esc(score(task, r.final, 2))}" style="left:${x(+r.final)}%;${hollow ? `background:${css('panel')};border:2px solid ${line}` : `background:${fill};border:1.5px solid ${css('panel')}`}"></span>`;
+    });
+    if (num(s.cell.mean) !== null && s.cell.setup !== 'notalk') h += `<span class="mean" data-tip="mean of the runs" style="left:${x(+s.cell.mean)}%;background:${line}"></span>`;
+    h += '</div></div>';
+  });
+  const a = rev ? hi : lo, b = rev ? lo : hi;
+  return h + `<div class="axis"><span>${score(task, a, 1)}</span><span>${task === 'perf' ? 'fewer cycles → ' : ''}${score(task, b, 1)}</span></div></div>`;
+}
+const counted = r => r.counted === '1';
+function runRows(rs, withCfg) {
+  return rs.map(r => {
+    const fl = (r.flags || '').split(' ').filter(Boolean).map(k => `<span class="chip${ATTN.includes(k) ? '' : ' q'}" data-tip="${esc(FLAGS[k]?.meaning)}">${esc(FLAGS[k]?.label || k)}</span>`).join('');
+    const note = [counted(r) ? '' : 'Not counted. ' + r.why_not, r.notes].filter(Boolean).join('; ');
+    const fin = r.final !== '' ? score(r.task, r.final, 2) + (r.raw_per_case_M !== '' ? ` (${(+r.raw_per_case_M).toFixed(3)}M)` : '') : '';
+    const cfg = withCfg ? `<td class="cfg" data-tip="${esc(cfgName(r))}">${esc(cfgName(r))}</td>` : '';
+    return `<tr class="${counted(r) ? '' : 'out'}"><td class="mono">${esc(r.run)}</td>${cfg}<td data-tip="${esc(P.status[r.status] || '')}">${esc(r.status)}</td><td class="num">${fin}</td><td class="num">${r.weighted_tokens_M !== '' ? (+r.weighted_tokens_M).toFixed(2) + 'M' : ''}</td><td class="num">${r.spend_share !== '' ? Math.round(100 * r.spend_share) + '%' : ''}</td><td class="num">${r.active_hours !== '' ? (+r.active_hours).toFixed(1) : ''}</td><td>${fl}</td><td class="note"${note.length > 48 ? ` data-tip="${esc(note)}"` : ''}>${esc(note)}</td><td>${esc(r.codex)}</td><td>${esc(r.started)}</td></tr>`;
+  }).join('');
+}
+const RUN_COLS = ['Status', 'Final', 'Tokens', 'Spent', 'Hours', 'Flags', 'Notes', 'Codex', 'Started'];
+const NUM_COLS = new Set(['Final', 'Tokens', 'Spent', 'Hours']);
+const runHead = first => [...first, ...RUN_COLS].map(c => `<th${NUM_COLS.has(c) ? ' class="num"' : ''}>${c}</th>`).join('');
+function runsOf(cellId) {   // counted runs first
+  return (BYCELL[cellId] || []).slice().sort((a, b) => (+b.counted - +a.counted) || ((+a.repeat || 0) - (+b.repeat || 0)));
+}
+function statBlock(label, x, task) {
+  const c = CAT[x.cell];
+  const rows = [];
+  rows.push(['Mean', `${score(task, c.mean)} <span class="ci">${scoreCI(task, c.ci_lo, c.ci_hi)}</span>`]);
+  rows.push([c.setup === 'notalk' ? 'Pool' : 'Runs', c.n]);
+  if (c.median !== '') rows.push(['Median', score(task, c.median)]);
+  if (task === 'ahc014' && num(c.raw_mean_M) !== null) rows.push(['Raw score', `${(+c.raw_mean_M).toFixed(3)}M per case`]);
+  if (num(c.spend_share) !== null) rows.push(['Budget spent', `${Math.round(100 * c.spend_share)}%`]);
+  if (num(c.hours_median) !== null) rows.push(['Hours per run', `${(+c.hours_median).toFixed(1)} <span class="ci">median, working time</span>`]);
+  if (x.gap_pct !== undefined) rows.push(['vs reference', `<b>${pct(x.gap_pct, 1)}</b> <span class="ci">${pctCI(x.gap_lo, x.gap_hi, 1)}</span> · ${sgn(+x.gap_points, task === 'gitzig' ? 1 : 0)} ${task === 'gitzig' ? 'points' : task === 'perf' ? 'cycles' : 'AtCoder points'} · ${esc(x.clear || 'one run, no interval')}${x.counted === false ? ' · not counted' : ''}`]);
+  (x.lam || []).forEach(l => rows.push([`λ vs ${esc(l.vs.toLowerCase())}`, `${l.lam.toFixed(2)} <span class="ci">${l.lo === null ? '' : `[${l.lo.toFixed(2)}, ${l.hi.toFixed(2)}]`}</span> <span class="mk" data-tip="${esc(l.how)}">how</span>`]));
+  rows.push(['Codex', esc(x.build || c.codex || '–')]);
+  const fc = Object.entries(counts(c)).map(([k, n]) => `<span class="chip${ATTN.includes(k) ? '' : ' q'}" data-tip="${esc(FLAGS[k]?.meaning)}">${n} ${esc(FLAGS[k]?.label || k)}</span>`);
+  if (fc.length) rows.push(['Flags', fc.join('')]);
+  return `<div><h4>${esc(label)}</h4><dl>${rows.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join('')}</dl></div>`;
+}
+function detailHTML(hit) {
+  const e = hit.e;
+  const parts = e.show === 'pair' ? [['Talking team', e.team], ['No-talk team', e.notalk]].filter(x => x[1]) : [['This configuration', e]];
+  const ref = parts[0][1].ref;
+  const c0 = CAT[parts[0][1].cell], task = c0.task;
+  const colLabel = hit.g.cols.find(c => c.key === hit.col)?.label || '';
+  const title = [MODEL_LABEL(c0.model), hit.r.label, hit.col === '1' ? '' : colLabel].filter(Boolean).join(' · ');
+  const refName = ref && (CAT[ref].setup === 'solo' && !CAT[ref].variant
+    ? (CAT[ref].model === c0.model ? 'single agent, same model and budget' : 'single agent, ' + N.model[CAT[ref].model]) : cfgName(CAT[ref]));
+  const meta = [N.task[task], `${+c0.budget_M}M weighted tokens`, CHANNEL[c0.setup] || '', c0.variant || '',
+    ref ? `reference: ${refName}` : ''].filter(Boolean).join(' · ');
+  let h = `<div class="detail" id="detail"><div class="dh"><span class="t">${esc(title)}</span><span class="sub">${esc(meta)}</span><button class="close" data-close="1">Close</button></div>`;
+  h += '<div class="dstats">' + parts.map(([l, x]) => statBlock(l, x, task)).join('') + (ref ? statBlock('Reference', {cell: ref}, task) : '') + '</div>';
+  const sets = parts.map(([l, x]) => ({label: l, cell: CAT[x.cell], runs: runsOf(x.cell).filter(r => counted(r) && r.final !== '')}));
+  if (ref) sets.push({label: 'Reference', cell: CAT[ref], runs: runsOf(ref).filter(r => counted(r) && r.final !== '')});
+  h += strip(task, sets);
+  h += `<div class="scroll"><table class="r"><tr>${runHead(['Run'])}</tr>`;
+  parts.forEach(([l, x]) => { h += `<tr class="sep"><td colspan="10">${esc(l)}</td></tr>` + runRows(runsOf(x.cell), false); });
+  if (ref) h += '<tr class="sep"><td colspan="10">Reference</td></tr>' + runRows(runsOf(ref), false);
+  return h + '</table></div></div>';
+}
+
+// ---------------------------------------------------------------- views
+function legendHTML() {
+  const items = ['Gap vs reference <span class="ci">[95% interval]</span>', '<b>bold</b>: interval excludes 0',
+    '*: not counted', '<span class="nn">n5</span>: runs, when not the usual n',
+    ...MARKS.map(([c, k]) => `<span class="mk">${c}</span>${esc(FLAGS[k].label)}`), '<span class="mk">B</span>Codex build differs'];
+  return `<div class="legend">${items.map(x => `<span class="item">${x}</span>`).join(' ')}</div>`;
+}
+function viewHTML(v) {
+  let h = `<div class="vhead"><h2>${esc(v.title)}</h2><span class="backs">${esc(v.backs)}</span></div>${legendHTML()}`;
+  if (v.note) h += `<p class="vnote">${esc(v.note)}</p>`;
+  let any = false;
+  v.blocks.forEach(b => {
+    let bh = '';
+    b.tasks.forEach(t => {
+      let th = '', wide = false;
+      t.budgets.forEach(bu => {
+        const gh = bu.grid.layout === 'model' ? modelGridHTML(bu) : genericGridHTML(bu);
+        if (!gh) return;
+        if (OPEN && OPEN.startsWith(bu.grid.anchor + '/')) wide = true;
+        th += `<section class="budget" id="${esc(bu.grid.anchor)}">${gh}<div class="dslot"></div></section>`;
+      });
+      if (th) {
+        const tid = t.budgets[0].grid.anchor.replace(/\/[^/]+$/, '');
+        bh += `<details class="task${wide ? ' wide' : ''}" open id="${esc(tid)}"><summary>${esc(N.task[t.task])}<span class="unit">${esc(N.unit[t.task])}${t.task === 'perf' ? '; gaps as speed' : ''}</span></summary>${th}</details>`;
+      }
+    });
+    if (bh) { any = true; h += (b.title ? `<h3 class="bt" id="${esc(v.id + '/' + b.id)}">${esc(b.title)}</h3>` : '') + `<div class="tasks">${bh}</div>`; }
+  });
+  if (!any) h += '<p class="vnote">Nothing matches the filters.</p>';
+  return h;
+}
+
+// ---------------------------------------------------------------- start page
+function startHTML() {
+  const n = RUNS.filter(counted).length;
+  let h = `<div class="counts"><span><b>${n.toLocaleString('en-US')}</b> runs counted</span><span><b>${RUNS.length - n}</b> not counted</span><span><b>${CFG.length}</b> configurations</span></div>`;
+  h += '<h3 class="qh">Questions</h3><table class="q">';
+  VIEWS.forEach(v => {
+    const ids = new Set(v.cells_used);
+    const k = RUNS.filter(r => counted(r) && ids.has(r.cell)).length;
+    h += `<tr><td><a href="#${v.id}">${esc(v.title)}</a></td><td class="num">${k.toLocaleString('en-US')} runs</td><td class="m">${esc(v.backs)}</td></tr>`;
+  });
+  h += `<tr><td><a href="#runs">Every run</a></td><td class="num">${RUNS.length.toLocaleString('en-US')} runs</td><td class="m"></td></tr></table>`;
+  return h;
+}
+
+// ---------------------------------------------------------------- every run
+let LIMIT = 300, Q = '';
+function runsHTML() {
+  const q = Q.trim().toLowerCase();
+  const rs = RUNS.filter(r => (F.all || counted(r)) && passes(r))
+    .filter(r => !q || (r.run + ' ' + cfgName(r) + ' ' + r.notes + ' ' + r.why_not + ' ' + r.flags).toLowerCase().includes(q));
+  let h = '<div class="vhead"><h2>Every run</h2></div>';
+  h += `<div class="search"><input type="search" id="q" placeholder="Search run, configuration, flag, note" aria-label="Search runs" value="${esc(Q)}"><label class="check"><input type="checkbox" id="all"${F.all ? ' checked' : ''}> Include runs not counted</label><span>${rs.length.toLocaleString('en-US')} runs${rs.length > LIMIT ? `, showing ${LIMIT}` : ''}</span><span>Download <a href="#" data-dl="runs">runs.csv</a> · <a href="#" data-dl="configs">configs.csv</a></span></div>`;
+  h += `<div class="scroll tall"><table class="r"><thead><tr>${runHead(['Run', 'Configuration'])}</tr></thead><tbody>`;
+  h += runRows(rs.slice(0, LIMIT), true) + '</tbody></table></div>';
+  if (rs.length > LIMIT) h += `<p><button class="chip-btn" id="more">Show ${Math.min(500, rs.length - LIMIT)} more</button></p>`;
+  return h;
+}
+
+// ---------------------------------------------------------------- page
+let ROUTE = 'start';
+function filtersHTML(viewId) {
+  const items = viewId === 'runs' ? RUNS : (VIEWS.find(v => v.id === viewId) || {cells_used: []}).cells_used.map(id => CAT[id]);
+  const models = [...new Set(items.map(c => c.model === 'opussol' ? 'mixed' : c.model))].sort((a, b) => MODEL_ORDER.indexOf(a) - MODEL_ORDER.indexOf(b));
+  const groups = [...new Set(items.map(c => GROUP[c.setup]))].filter(Boolean).sort((a, b) => Object.keys(GROUP_NAME).indexOf(a) - Object.keys(GROUP_NAME).indexOf(b));
+  const sizes = [...new Set(items.map(c => +c.team_size))].sort((a, b) => a - b);
+  const chip = (kind, val, label, set) => `<button class="chip-btn" data-f="${kind}" data-v="${esc(val)}" aria-pressed="${set.has(val)}">${esc(label)}</button>`;
+  let h = '';
+  if (models.length > 1) h += `<span class="fgroup"><span>Model</span>${models.map(m => chip('models', m, MODEL_LABEL(m), F.models)).join('')}</span>`;
+  if (groups.length > 1) h += `<span class="fgroup"><span>Setup</span>${groups.map(g => chip('groups', g, GROUP_NAME[g], F.groups)).join('')}</span>`;
+  if (sizes.length > 1) h += `<span class="fgroup"><span>Agents</span>${sizes.map(k => chip('sizes', String(k), String(k), F.sizes)).join('')}</span>`;
+  return h;
+}
+function render(scrollTo) {
+  const [first] = ROUTE.split('/');
+  document.querySelectorAll('#nav a').forEach(a => a.setAttribute('aria-current', a.dataset.v === first ? 'page' : 'false'));
+  const isView = VIEWS.some(v => v.id === first) || first === 'runs';
+  const fh = isView ? filtersHTML(first) : '';
+  $('#filters').style.display = fh ? '' : 'none';
+  $('#fbody').innerHTML = fh;
+  let h;
+  if (first === 'runs') h = runsHTML();
+  else if (VIEWS.some(v => v.id === first)) h = viewHTML(VIEWS.find(v => v.id === first));
+  else h = startHTML();
+  $('#main').innerHTML = h;
+  if (OPEN) {
+    const hit = findCell(OPEN);
+    const sec = hit && document.getElementById(hit.g.anchor);
+    if (sec) sec.querySelector('.dslot').innerHTML = detailHTML(hit);
+  }
+  if (scrollTo) {
+    const el = document.getElementById(scrollTo);
+    if (el) { const p = el.closest('details.task'); if (p) p.open = true; el.scrollIntoView({block: 'start'}); }
+  }
+}
+function go(hash, push) {
+  hash = decodeURIComponent((hash || '').replace(/^#/, '')) || 'start';
+  ROUTE = hash; OPEN = null;
+  const first = hash.split('/')[0];
+  let target = null;
+  if (VIEWS.some(v => v.id === first) && hash !== first) {
+    const hit = findCell(hash);
+    if (hit) { OPEN = hash; target = hit.g.anchor; } else target = hash;
+  }
+  render(target);
+  if (!target) window.scrollTo(0, 0);
+  if (push) { try { history.replaceState(null, '', '#' + hash); } catch (e) {} }
+}
+function download(name, text) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], {type: 'text/csv'}));
+  a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+(function boot() {
+  $('#asof').textContent = `Data as of ${P.asof}`;
+  $('#fasof').textContent = `Data as of ${P.asof}`;
+  document.addEventListener('click', e => {
+    const d = e.target.closest('[data-dl]'); if (!d) return;
+    e.preventDefault(); d.dataset.dl === 'runs' ? download('runs.csv', P.runsCSV) : download('configs.csv', P.configsCSV);
+  });
+  // one tooltip style everywhere: hover or keyboard focus; a tap on a mark shows it on touch screens
+  const tip = $('#tip');
+  const show = el => {
+    tip.textContent = el.dataset.tip; tip.classList.add('on');
+    const r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+    let x = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), innerWidth - w - 8), y = r.bottom + 6;
+    if (y + h > innerHeight - 8) y = r.top - h - 6;
+    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+  };
+  const hide = () => tip.classList.remove('on');
+  document.addEventListener('mouseover', e => { const el = e.target.closest('[data-tip]'); el && el.dataset.tip ? show(el) : hide(); });
+  document.addEventListener('focusin', e => { const el = e.target.closest('[data-tip]'); el && el.dataset.tip ? show(el) : hide(); });
+  document.addEventListener('scroll', hide, {passive: true});
+  document.addEventListener('click', e => { const m = e.target.closest('.mk[data-tip]'); if (m && matchMedia('(hover: none)').matches) { e.stopPropagation(); show(m); } }, true);
+  const setNav = () => document.documentElement.style.setProperty('--navh', $('#bar').offsetHeight + 'px');
+  window.addEventListener('resize', setNav);
+  $('#nav').innerHTML = [['start', 'Start'], ...VIEWS.map(v => [v.id, v.title]), ['runs', 'Every run']]
+    .map(([id, t]) => `<a href="#${id}" data-v="${id}">${esc(t)}</a>`).join('');
+  window.addEventListener('hashchange', () => go(location.hash));
+  $('#fbody').addEventListener('click', e => {
+    const b = e.target.closest('[data-f]'); if (!b) return;
+    const s = F[b.dataset.f], v = b.dataset.v; s.has(v) ? s.delete(v) : s.add(v); render();
+  });
+  $('#main').addEventListener('change', e => { if (e.target.id === 'all') { F.all = e.target.checked; LIMIT = 300; render(); } });
+  $('#main').addEventListener('click', e => {
+    if (e.target.closest('[data-close]')) { const hit = findCell(ROUTE); go(hit ? hit.g.anchor : ROUTE, true); return; }
+    if (e.target.id === 'more') { LIMIT += 500; render(); return; }
+    const cell = e.target.closest('[data-a]'); if (!cell) return;
+    const a = cell.dataset.a;
+    const y = cell.getBoundingClientRect().top;
+    if (OPEN === a) { OPEN = null; ROUTE = findCell(a).g.anchor; } else { OPEN = a; ROUTE = a; }
+    try { history.replaceState(null, '', '#' + ROUTE); } catch (er) {}
+    render();
+    const c2 = document.querySelector(`[data-a="${CSS.escape(a)}"]`);
+    if (c2) window.scrollBy(0, c2.getBoundingClientRect().top - y);
+  });
+  $('#main').addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-a]')) { e.preventDefault(); e.target.click(); } });
+  $('#main').addEventListener('input', e => { if (e.target.id === 'q') { Q = e.target.value; LIMIT = 300; render(); const q = $('#q'); q.focus(); q.setSelectionRange(Q.length, Q.length); } });
+  const fl = Object.values(FLAGS).map(x => `<dt>${esc(x.label)}</dt><dd>${esc(x.meaning)}</dd>`).join('');
+  const st = Object.entries(P.status).map(([k, x]) => `<dt>${esc(k)}</dt><dd>${esc(x)}</dd>`).join('');
+  $('#key').innerHTML = `<dl>
+    <dt>Cell</dt><dd>Gap of the configuration against its reference, in %, with its bootstrap 95% interval. + means better than the reference. The take-home is scored as speed (1 / clock cycles). Bold: the interval excludes 0. Click a cell for its runs.</dd>
+    <dt>*</dt><dd>Not counted: the reference single agent spent under 85% of its budget.</dd>
+    <dt>n</dt><dd>Number of counted runs. Each grid says its usual n; other values are marked next to the cell. For no-talk teams it is the pool size; the team of k is the average best over every group of k drawn from the pool.</dd>
+    <dt>λ</dt><dd>In a cell's details, for git-to-zig teams: a team of N agents with budget b each matches one agent with budget X; λ = ln(X / b) / ln N. Computed by analysis/lam.py.</dd>
+    <dt>Hours</dt><dd>Median working hours per run; usage-limit waits, pauses and down time are not counted.</dd>
+    <dt>AHC014</dt><dd>AtCoder performance stops at 3389 (first place), so cells also give the raw private score per case, in millions.</dd>
+    <dt>Dots</dt><dd>In a cell's details: one dot per counted run, the large dot is the mean; a hollow dot did not spend its budget.</dd>
+    <dt>Codex build differs</dt><dd>The configuration and its reference ran different Codex versions.</dd>
+    ${fl}${st}</dl>`;
+  if (window.matchMedia && matchMedia('(max-width: 600px)').matches) $('#filters').open = false;
+  setNav(); if (document.fonts) document.fonts.ready.then(setNav);
+  go(location.hash);
+})();
+</script>
+</body>
+</html>

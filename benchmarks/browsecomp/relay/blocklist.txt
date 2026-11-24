@@ -1,0 +1,9 @@
+# One domain per line; subdomains are blocked too.
+huggingface.co
+hf.co
+# GitHub: github.com covers gist.github.com and its other subdomains;
+# raw files and user content live on githubusercontent.com (raw., gist., objects., ...).
+github.com
+githubusercontent.com
+raw.githubusercontent.com
+gist.github.com

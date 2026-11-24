@@ -1,9 +1,15 @@
-.venv/
-.cache/
-__pycache__/
-.pytest_cache/
-*.pyc
+# Run output, and what the harness downloads and builds (CLI releases, task clones, datasets, task directories)
 jobs/
-benchmarks/mnistboard/environment/mnist-raw/
-benchmarks/mnistboard/tests/mnist_test.npz
+.cache/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
 .DS_Store
+
+# Built results explorer
+site/out/

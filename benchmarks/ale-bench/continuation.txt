@@ -1,0 +1,10 @@
+ENVIRONMENT FEEDBACK: Your turn ended, but this task is NOT finished and you still have many HOURS of compute budget remaining. Do not stop and do not conclude - treat this as a long-running optimization effort and keep going.
+
+Your best submitted program so far is already saved and safe. Your job now is to BEAT it. Hitting a plateau is not a reason to stop; it is a signal to try a structurally DIFFERENT approach.
+
+Take another turn now. Do not answer only in prose - use tool calls (bash):
+  - Re-read the task instruction and the problem statement (problem/statement.md), and recall your best public score so far (`scores`).
+  - Try a fundamentally different approach than the ones you have already tried, for example: a different construction or search space, a different neighbourhood or move set, a better evaluation function or incremental score update so the search runs more iterations, simulated annealing or beam search tuned to the time limit, or exploiting structure of the inputs that the generator (tools/src) reveals.
+  - Edit your program in your working copy, check it with `ale-local test` (it runs the public seeds the way the judge does), and run `submit` to get a fresh public score. Submit early and often; every improvement over your best counts.
+
+Keep iterating and keep submitting for as long as you can make progress. Only stop if you have genuinely exhausted clearly distinct approaches. Continue working now.

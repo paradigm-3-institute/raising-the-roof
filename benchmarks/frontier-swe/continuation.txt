@@ -1,0 +1,10 @@
+ENVIRONMENT FEEDBACK: Your turn ended, but this task is NOT finished and you still have many HOURS of compute budget remaining. Do not stop and do not conclude - treat this as a long-running engineering effort and keep going.
+
+The version in /app is already saved and safe. Your job now is to BEAT it. Hitting a plateau is not a reason to stop; it is a signal to try a structurally DIFFERENT approach.
+
+Take another turn now. Do not answer only in prose - use tool calls (bash):
+  - Re-read the task instruction, /logs/agent/frontier-swe/submissions.jsonl, and your working copy (run `workcopy` to print its path), and recall your best local score so far.
+  - Run the task's own self-check on your working copy, find what still fails, and fix it, or try a fundamentally different design for the parts that keep failing.
+  - Build and test in your working copy, then run `submit --score S --note "..."` to promote an improvement into /app. Every improvement over the version in /app counts.
+
+Keep iterating and keep submitting for as long as you can make progress. Only stop if you have genuinely exhausted clearly distinct approaches. Continue working now.

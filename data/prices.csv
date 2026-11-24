@@ -1,0 +1,13 @@
+model_id,tier,input,cached_input,cache_write,output
+claude-opus-5,base,5,0.5,6.25,25
+claude-opus-5-5,base,4,0.2,5,20
+claude-sonnet-5,base,2,0.2,2.5,10
+claude-sonnet-5-5,base,2,0.1,2.5,10
+gpt-5.6-terra,base,2,0.2,2.5,12
+gpt-5.6-terra,long,4,0.4,5,18
+gpt-6.1-sol,base,2,0.1,2.5,10
+gpt-6.1-sol,long,4,0.2,5,15
+gpt-6.1-terra,base,1,0.05,1.25,5
+gpt-6.1-terra,long,2,0.1,2.5,7.5
+gpt-6.2-sol,base,2,0.1,2.5,10
+gpt-6.2-sol,long,4,0.2,5,15

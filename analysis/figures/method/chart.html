@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ways to spend one budget</title>
+<link rel="stylesheet" href="../_kit/kit.css">
+</head>
+<body>
+<div id="frame">
+  <header>
+    <div class="mark"></div>
+    <div>
+      <h1 id="title"></h1>
+      <div class="sub" id="sub"></div>
+    </div>
+  </header>
+  <div id="lead"></div>
+  <div id="chart"><svg id="svg"></svg></div>
+  <footer id="foot"></footer>
+</div>
+<script src="../_kit/kit.js"></script>
+<script>
+// "Ways to spend one budget" figure for Raising the Roof: how each setup splits the same budget. Look, helpers and
+// boot from ../_kit/.
+// ============================================================================
+// 1. Config, text and data
+// ============================================================================
+const CHART = { width: 1080, height: 1350, fps: 30, duration: MOTION.duration };
+
+// The setup of the study (an explainer: no scores).
+// Source: the post's methodology appendix, sections "Multi-agent setups", "Token budget", "Scoring".
+const DATA = {
+  budgetM: 8,             // "Most comparisons use a total of 8M weighted tokens." (Token budget)
+  altBudgetM: 32,         // "some comparisons were repeated at 32M weighted tokens" (Token budget)
+  teamSizesRun: [2, 4, 8],// "teams of 2, 4, and 8 agents given the same total token budget" (Multi-agent setups)
+  teamSize: 4,            // the team size drawn; one of teamSizesRun, the same in all three team rows
+  weights: { output: 1, uncachedInput: 0.25, cachedInput: 0.02 }, // "an uncached input token therefore costs a quarter of an output token, and a cached input token 2% of one"
+};
+
+// Names and colors come from the kit's SETUP.
+const ROWS = [
+  { key: 'single', setup: 'single',       note: 'one session' },
+  { key: 'struct', setup: 'structured',   note: 'work split by a prompt with fixed rules' },
+  { key: 'self',   setup: 'selforg',      note: 'work split by the agents themselves' },
+  { key: 'orch',   setup: 'orchestrated', note: 'work split by one orchestrator' },
+];
+
+// title and footnote numbers are filled in section 3 from DATA
+const TEXT = { title: '', sub: '', foot: '' };
+
+// Beats: [start, duration] in seconds.
+const BEATS = {
+  scaffold: [0.0, 0],     // title, footnote and the four row names, on at frame 0
+  single:   [0.4, 1.2],   // one agent, one 8M bar
+  struct:   [1.9, 2.1],   // the same 8M bar, split into equal shares, one per agent; shared files
+  self:     [4.4, 1.6],   // the same split; a shared channel
+  orch:     [6.4, 1.8],   // the same 8M bar stays whole and shared; the orchestrator hands out tasks
+};
+
+// ============================================================================
+// 3. The chart. draw(t) depends only on t.
+// ============================================================================
+
+// ---- every number on the chart, from DATA ----
+const B = DATA.budgetM;                 // 8 (M weighted tokens)
+const N = DATA.teamSize;                // 4 agents per team
+const SHARE = B / N;                    // 2 (M each, structured and self-organized)
+const HELPERS = N - 1;                  // up to 3 helpers (orchestrated)
+const fmtM = (v) => `${+v.toFixed(2)}M`;
+const pct = (w) => `${+(w * 100).toFixed(2)}%`;
+const sizesRun = DATA.teamSizesRun.join(', ').replace(/, (\d+)$/, ' or $1');
+
+TEXT.title = `Every team got the same budget of weighted tokens as a single agent`;
+TEXT.foot = `Teams of ${N} shown; most had ${sizesRun}. Some comparisons used ${fmtM(DATA.altBudgetM)} for single agents and teams alike.<br>`
+  + `A team is scored on its best agent’s submission. Output tokens count fully, input at a quarter, `
+  + `or ${pct(DATA.weights.cachedInput)} when cached.`;
+TEXT.footHTML = TEXT.foot;
+
+{
+  logTable([{ budgetM: B, teamSize: N, shareM: SHARE, helpers: HELPERS, altBudgetM: DATA.altBudgetM, teamSizesRun: DATA.teamSizesRun.join(' ') }], 'numbers on the chart');
+  logTable([DATA.weights], 'token weights');
+  console.assert(SHARE * N === B, 'equal shares add up to the budget');
+  console.assert(DATA.teamSizesRun.includes(N), 'the team size shown was run');
+  console.assert(DATA.weights.uncachedInput === 0.25, 'footnote says "a quarter"');
+}
+
+const COL = Object.fromEntries(ROWS.map((r) => [r.key, SETUP[r.setup]]));   // fill, line, text
+
+const SZ = { name: TYPE.name, note: TYPE.label, comm: TYPE.annot, block: TYPE.label, small: TYPE.small };
+const G = { barH: 58, r: 20, rO: 23, gap: MARK.bar.gap };
+// y positions inside a row, from the row's top
+const Y = {
+  single: { name: 28, node: 72, bar: 104 },
+  team:   { name: 28, label: 80, comm: 116, node: 156, bar: 190 },
+};
+const ROW_H = { single: Y.single.bar + G.barH, team: Y.team.bar + G.barH };
+
+// Per-row timing, as offsets from the row's beat start (seconds)
+const TIMING = {
+  single: { bar: [0.1, 0.9], node: 0.0, label: 0.85 },
+  struct: { bar: [0.0, 0.6], label8: 0.45, split: [0.75, 0.45], nodes: [0.95, 0.5], comm: [1.45, 0.5], commLabel: 1.7 },
+  self:   { bar: [0.0, 0.5], label8: 0.35, split: [0.6, 0.4], nodes: [0.75, 0.45], comm: [1.1, 0.45], commLabel: 1.3 },
+  orch:   { bar: [0.0, 0.6], label8: 0.45, nodes: [0.8, 0.6], comm: [1.2, 0.5], commLabel: 1.45 },
+};
+
+function layout() {
+  const total = ROW_H.single + 3 * ROW_H.team;
+  const gap = Math.min(80, (H - total) / 3);
+  const y0 = Math.max(0, (H - total - 3 * gap) / 2);
+  const top = {};
+  let y = y0;
+  for (const r of ROWS) { top[r.key] = y; y += (r.key === 'single' ? ROW_H.single : ROW_H.team) + gap; }
+  const nodeX = (i) => ((i + 0.5) * W) / N;
+  return { top, nodeX };
+}
+
+// one block of the bar, x0..x1, with the gap between neighbours opened by `g` px on inner edges
+function block(parent, x0, x1, y, fill, gL, gR) {
+  const a = x0 + gL, b = x1 - gR;
+  if (b - a > 0.5) h(parent, 'rect', { x: a, y, width: b - a, height: G.barH, rx: MARK.bar.radius, fill });
+}
+function inText(parent, cx, y, txt, opacity, size = SZ.block) {
+  if (opacity > 0) h(parent, 'text', { x: cx, y: y + G.barH / 2 + size * 0.36, 'text-anchor': 'middle', 'font-size': size, 'font-weight': 600, fill: C.ink, opacity }, txt);
+}
+function node(parent, cx, cy, r, u, style) {
+  if (u <= 0) return;
+  const rr = r * u;
+  if (style.dashed) h(parent, 'circle', { cx, cy, r: Math.max(0.1, rr - 1.5), fill: C.bg, stroke: style.stroke, 'stroke-width': 3, 'stroke-dasharray': '5 4' });
+  else h(parent, 'circle', { cx, cy, r: rr, fill: style.fill });
+}
+function arrowHead(parent, x, y, color, opacity) {
+  if (opacity > 0) h(parent, 'path', { d: `M${x - 7},${y - 10} L${x + 7},${y - 10} L${x},${y} Z`, fill: color, opacity });
+}
+function docIcon(parent, cx, cy, color, u) {
+  if (u <= 0) return;
+  const w = 28, hh = 34, f = 9, x = cx - w / 2, y = cy - hh / 2;
+  const g = h(parent, 'g', { opacity: u });
+  h(g, 'path', { d: `M${x},${y} H${x + w - f} L${x + w},${y + f} V${y + hh} H${x} Z`, fill: C.bg, stroke: color, 'stroke-width': 2.5, 'stroke-linejoin': 'round' });
+  h(g, 'path', { d: `M${x + w - f},${y} V${y + f} H${x + w}`, fill: 'none', stroke: color, 'stroke-width': 2, 'stroke-linejoin': 'round' });
+  for (const k of [0, 1, 2]) h(g, 'line', { x1: x + 7, x2: x + w - 7, y1: y + 14 + k * 6.5, y2: y + 14 + k * 6.5, stroke: color, 'stroke-width': 2 });
+}
+
+
+function draw(t) {
+  svg.replaceChildren();
+  svg.setAttribute('fill', C.ink);
+  const L = layout();
+
+  for (const r of ROWS) {
+    const s = BEATS[r.key][0], T = TIMING[r.key], c = COL[r.key], top = L.top[r.key];
+    setupName(svg, { y: top + (r.key === 'single' ? Y.single.name : Y.team.name), setup: r.setup, note: r.note, t, start: s });
+    // scaffold: an empty track of the same length in every row, until that row's bar has covered it
+    const ybar = top + (r.key === 'single' ? Y.single.bar : Y.team.bar);
+    if (prog(t, s + T.bar[0], T.bar[1]) < 1) h(svg, 'rect', { x: 0, y: ybar, width: W, height: G.barH, rx: 3, fill: C.grid });
+
+    // ---- single agent: one node, one whole bar ----
+    if (r.key === 'single') {
+      const yb = top + Y.single.bar;
+      const u = prog(t, s + T.bar[0], T.bar[1], ease.inOut);
+      block(svg, 0, W * u, yb, c.fill, 0, 0);
+      inText(svg, W / 2, yb, fmtM(B), fade(t, s + T.label, 0.25));
+      node(svg, W / 2, top + Y.single.node, G.r, prog(t, s + T.node, 0.3), { fill: c.fill });
+      continue;
+    }
+
+    // ---- teams: the same whole bar sweeps in first ----
+    const yb = top + Y.team.bar, yn = top + Y.team.node, yc = top + Y.team.comm, yl = top + Y.team.label;
+    const uBar = prog(t, s + T.bar[0], T.bar[1], ease.inOut);
+    const uSplit = T.split ? prog(t, s + T.split[0], T.split[1], ease.inOut) : 0;
+    if (uSplit <= 0) block(svg, 0, W * uBar, yb, c.fill, 0, 0);
+    else for (let i = 0; i < N; i++) block(svg, (i * W) / N, ((i + 1) * W) / N, yb, c.fill, i ? G.gap * uSplit : 0, i < N - 1 ? G.gap * uSplit : 0);
+
+    // budget labels: the whole 8M, then (split rows) one equal share per agent, or (orchestrated) one shared pot
+    const in8 = fade(t, s + T.label8, 0.25);
+    if (T.split) {
+      inText(svg, W / 2, yb, fmtM(B), in8 * (1 - prog(t, s + T.split[0], 0.2)));
+      const in2 = fade(t, s + T.split[0] + 0.2, 0.3);
+      for (let i = 0; i < N; i++) inText(svg, L.nodeX(i), yb, fmtM(SHARE), in2);
+    } else {
+      const sw = prog(t, s + T.commLabel, 0.3);
+      inText(svg, W / 2, yb, fmtM(B), in8 * (1 - sw));
+      inText(svg, W / 2, yb, `${fmtM(B)} shared by the whole team`, sw);
+    }
+
+    // agents
+    const [n0, nd] = T.nodes;
+    const gap = nd > 0.25 ? (nd - 0.25) / (N - 1) : 0;
+    for (let i = 0; i < N; i++) {
+      const u = prog(t, s + n0 + i * gap, 0.25);
+      if (r.key === 'orch') node(svg, L.nodeX(i), yn, i === 0 ? G.rO : G.r, u, i === 0 ? { fill: c.text } : { dashed: true, stroke: c.line });
+      else node(svg, L.nodeX(i), yn, G.r, u, { fill: c.fill });
+    }
+
+    // how the agents talk
+    const [c0, cd] = T.comm;
+    const uc = prog(t, s + c0, cd, ease.inOut);
+    const ul = fade(t, s + T.commLabel, 0.3);
+    const xL = L.nodeX(0), xR = L.nodeX(N - 1);
+    if (r.key === 'struct') {
+      // a shared folder: every agent reads and writes the same files
+      if (uc > 0) {
+        for (let i = 0; i < N; i++) {
+          const x = L.nodeX(i);
+          drawOn(h(svg, 'path', { d: `M${x},${yn - G.r - 3} V${yc}`, fill: 'none', stroke: c.line, 'stroke-width': 2.5 }), clamp01(uc * 3));
+        }
+        drawOn(h(svg, 'path', { d: `M${W / 2},${yc} H${xL}`, fill: 'none', stroke: c.line, 'stroke-width': 2.5 }), clamp01(uc * 1.5 - 0.3));
+        drawOn(h(svg, 'path', { d: `M${W / 2},${yc} H${xR}`, fill: 'none', stroke: c.line, 'stroke-width': 2.5 }), clamp01(uc * 1.5 - 0.3));
+        docIcon(svg, W / 2, yc, c.line, clamp01(uc * 2 - 0.6));
+      }
+      if (ul > 0) h(svg, 'text', { x: W / 2, y: yc - 27, 'text-anchor': 'middle', 'font-size': SZ.comm, 'font-weight': 600, fill: c.text, opacity: ul }, 'shared files');
+    } else if (r.key === 'self') {
+      // a shared channel every agent posts to and reads
+      if (uc > 0) {
+        for (let i = 0; i < N; i++) {
+          const x = L.nodeX(i);
+          drawOn(h(svg, 'path', { d: `M${x},${yn - G.r - 3} V${yc}`, fill: 'none', stroke: c.line, 'stroke-width': 2.5 }), clamp01(uc * 3));
+        }
+        const w = (xR - xL) * clamp01(uc * 1.4 - 0.3);
+        if (w > 0) h(svg, 'rect', { x: W / 2 - w / 2 - 4, y: yc - 4, width: w + 8, height: 8, rx: 4, fill: c.line });
+      }
+      if (ul > 0) {
+        const el = h(svg, 'text', { x: W / 2, y: yc - 27, 'text-anchor': 'middle', 'font-size': SZ.comm, 'font-weight': 600, fill: c.text, opacity: ul }, 'shared channel');
+        h(el, 'tspan', { 'font-weight': 400, fill: C.muted }, ': message board, direct messages or chat');
+      }
+    } else {
+      // the orchestrator hands out tasks to the helpers, who report back to it
+      if (uc > 0) {
+        const p = h(svg, 'path', { d: `M${xL},${yn - G.rO - 3} V${yc} H${xR}`, fill: 'none', stroke: c.line, 'stroke-width': 2.5, 'stroke-linejoin': 'round' });
+        drawOn(p, clamp01(uc * 1.3));
+        for (let i = 1; i < N; i++) {
+          const x = L.nodeX(i);
+          const ud = clamp01((uc - 0.55) / 0.45);
+          drawOn(h(svg, 'path', { d: `M${x},${yc} V${yn - G.r - 4}`, fill: 'none', stroke: c.line, 'stroke-width': 2.5 }), ud);
+          arrowHead(svg, x, yn - G.r - 3, c.line, clamp01((ud - 0.7) / 0.3));
+        }
+      }
+      if (ul > 0) {
+        h(svg, 'text', { x: W / 2, y: yc - 27, 'text-anchor': 'middle', 'font-size': SZ.comm, 'font-weight': 600, fill: c.text, opacity: ul },
+          `hands out tasks to up to ${HELPERS} helpers, who report back`);
+      }
+      const uo = fade(t, s + T.nodes[0] + 0.2, 0.3);
+      if (uo > 0) h(svg, 'text', { x: xL + G.rO + 12, y: yn + 7, 'font-size': SZ.small, fill: c.text, 'font-weight': 600, opacity: uo }, 'orchestrator');
+    }
+  }
+}
+
+boot();
+</script>
+</body>
+</html>

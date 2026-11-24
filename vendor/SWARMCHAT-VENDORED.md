@@ -1,0 +1,81 @@
+# Vendored: upstream SwarmChat
+
+- Source: https://github.com/Pranjal2041/swarmchat
+- Commit: `5ee0c0e307e7b58eb6aa881ee9a7b60d1ace5149` (2026-11-05, "Extras: run coding agents and teams on
+  ProgramBench").
+- License: MIT, `swarmchat/LICENSE`.
+- Copied with `git archive` of that commit, byte for byte. No file is changed and there is no patch.
+- Left out: `bench/` (load tests), `docs/viewer.webp` (a screenshot), `.github/workflows/tests.yml`, `.gitignore`.
+- Upstream's tests at this commit: `python3 -m unittest discover -s tests` in `vendor/swarmchat` (186 tests).
+
+How the harness uses it: `swarmchat_glue.py` and docs/setups.md. The container gets `LICENSE`,
+`swarmchat/*.py` and `extras/programbench/{guest.py,run.py}` (not the viewer's `swarmchat/page/`).
+
+`tests/test_swarmchat.py` checks these hashes (sha256, then the path under `vendor/swarmchat/`):
+
+```
+5de37a32249ef0f558beba2512bc36d75a9581ebc8f1dda5f28d7ba168a6bede  DESIGN.md
+aff440541db19ec61cb0fffd4a9fa9b02572cdcc4f7530bbaf40081b6a867d16  LICENSE
+aa0b6373be62330a3bd7bb0c3409710529b77558310b1a26a0cacd49585fd150  README.md
+43f5f198f542526f50624713fa1771bef14f4e20904342f9f1724f22671e0fc7  extras/README.md
+b115ea8bf974ad06ebb063909472dff459fcbec2d548bed02b66d16fb92cb1e8  extras/programbench/README.md
+1ad4c33a15f1568c1653f6079e09646ee5887dc413986a40d61ef9a0473ad6b4  extras/programbench/configs/features.toml
+41649d63757aef1a0035f2e692b078b683faf895a3dd418144c55dfa3a409b44  extras/programbench/configs/flat.toml
+74f4f7eb01ce84aa97dde987c8ef2ad04a535a4846393b20e2189bb1cdccb362  extras/programbench/configs/lead.toml
+0431dc3f79bbd6bec53f88d939514efb1a9573abe999cdd4220bb4402a6b2dd0  extras/programbench/configs/owner.toml
+a969cf21684ccabf5425629e6b701cc1796c13556f1317a019729b2745c9c1be  extras/programbench/configs/phased.toml
+6832726403e20ee054bb99461bba91840a5630947bee3ca45473e64d28ae9b36  extras/programbench/configs/single.toml
+d921ea60c38259096bcd25b9053340b3689f707cc14a02f8ea877defd2febe88  extras/programbench/configs/testers.toml
+d99516c695f80602eaf0a88a2684a3ee0e665aa23012c6918e1bc7c8e5d2f1e9  extras/programbench/guest.py
+0f796e58f91d1c07bb2c1b1d0f8bf3a83017c3a5dec1bdc6fae733b2cd2e875b  extras/programbench/prompts/LICENSE-mini-swe-agent.md
+d9cd542a29e0c69c15d7969c38fb5e5f79c9274c5da08018cd29b4f1e1cacb0f  extras/programbench/prompts/builder.md
+031788ec34ee722e2741d0604946b8bef6398005a36faff949ac9823f4de7f24  extras/programbench/prompts/chat.md
+03e1ef4e54ba06ad232f7dda1cd457c2b5c1f9ef2de35863ebb87df1b713a03f  extras/programbench/prompts/features.md
+609c5dd0ff7576755aa7737ab6726ba7664186b90ab919c08bc23a19ab72317d  extras/programbench/prompts/flat.md
+11fb4f4a7c018f553925967e2c4cc2e5d36dcf848140899dbda0b6fc164af620  extras/programbench/prompts/helper-loop.md
+0f0028782c1623fbf6c1038b819e4f8d1867b998285a8d4d2a51e2166c5c5134  extras/programbench/prompts/helper.md
+4fbf70ba02d3670a18e9b522db66a61a593e111127b5bbc4644ac6a89600fba1  extras/programbench/prompts/lead-loop.md
+2626195d3342dfa56b5c131a73f0442449827bd711389bec0a48213eb6ebe8c6  extras/programbench/prompts/lead.md
+a49fdbee86dee26cf7f7868c707adb7d3ef55d5f1160af1528f777b2335256a4  extras/programbench/prompts/loop.md
+54382ea6f9f6de1ea3a5d64f4f26b0dcb53167b2e2e7de65a94b07685f17192d  extras/programbench/prompts/owner-loop.md
+bc2eb7bcd44587be1ac7de6bfc2cd46ce6104adf19e0b58a2853e6eb33144b0d  extras/programbench/prompts/owner.md
+70f2a10c0f94a21eda7d93a8ca5ce54a06dad836477efec7c4d6cc929a8c683e  extras/programbench/prompts/phased-loop.md
+002740a3f289cae0ade75203775a204d23b24f087a5fff12fc5235d070b2b045  extras/programbench/prompts/phased-over.md
+de976ceccfb99b41ac4d59089a4c86610055fb72acd1f3a18a47a23d9e03084c  extras/programbench/prompts/phased.md
+2860dc9da94141decd604f6dc25c0e143ed181efc9890f86a185b56fa0ff816f  extras/programbench/prompts/resume.md
+ccd088a15b1c27da739953cfd30fa96b9407703fb009e524efe8e5bb3b6ec517  extras/programbench/prompts/single.md
+4c3da677b6340b354dea6756a34dc55ba0f2113f4ffd2b9ac16e06e5aa336ff2  extras/programbench/prompts/system.md
+9939e832e5db3536f1716fbc13517c3dd120d8c3da9845162c4811bd036473a1  extras/programbench/prompts/task.md
+f56fb17490293d8dab0e441898d8e37bce9ac983a95ea1c21a29f12efea9d9f6  extras/programbench/prompts/team-loop.md
+9e01934219dc5ed8a82f5751a11f07cb9160132b355d017aaa8c91076d84533f  extras/programbench/prompts/team.md
+484b42c42a4403ea95e761b5a788cf35edf2626f79e08882f2808bc8ae270867  extras/programbench/prompts/tester-loop.md
+ec8ccd3958fdd6c98770613c993bdef6f4eb28f98198f86bdaf2af7b02360137  extras/programbench/prompts/tester.md
+fac69087cc56606a6d989c580068a0b8e2452e8e096177be5cbca588b544dbe1  extras/programbench/prompts/time-warning.md
+68739ae6f597a338cef6204ddec2975d4bff3347b2a492dd3db67a5e186701f5  extras/programbench/prompts/worker.md
+8f13bdfd85106e2259b6316c76bf8d0e8bec220badc5863c2d84beff7c5a931e  extras/programbench/run.py
+6d267b289bfb296004d816ff8de317e3fc196c42b6f2a360082da351fe5b6dbd  pyproject.toml
+1a6f05e5dd1a6593d6bcf9d12bf7cd16ebf20bbd988c22b66b9e971b156db369  swarmchat/__init__.py
+13a1a5b340cdcfc1902b62be90e508c7c71886000d5bf087e7854aadf09fb35e  swarmchat/__main__.py
+b78d0516eba2810250b405963d25153202dce43016749c6b122c830c070753bc  swarmchat/api.py
+05064f77bea097e8010eb01307956be772e1dbb5fbe7bb5c91c57c10d414b1e0  swarmchat/cli.py
+68848eaa5a0196cd57303ac1bce5ed0833bb78c00c7f3a8d2d552a49ec262e65  swarmchat/client.py
+4964850f9a5d203647c325bf84e4194010667ad3b061fbac3a1063d08115bbde  swarmchat/config.py
+66d9504a33faa52e0520178e4dabf87d577a4a5ff1b26e86e4888f5408c635d2  swarmchat/files.py
+03a82aaf0c67eecc22cef26b01da39d412c139b7dd4711ae81c3caacaca98911  swarmchat/locking.py
+68c1a8fea885c7992362463fce4e937758fa340986a14d6c7805a7aac6a0b856  swarmchat/page/app.css
+306bd2ea5f26d244efd11e146d1c346062932289980502f59ee0f4e4890fdc9f  swarmchat/page/app.js
+04993767aea5005dd84a58a01bb17ac349677094ea9d527049bd4d5e91920cee  swarmchat/page/gate.html
+83cb82cebcb7aada0fcc610e456b2bccc62b62c293dc92aa5b39453adad12bec  swarmchat/page/gate.js
+e3dd3ec1e5c9dddaab08619240020bda550d558f62be4a95c4049a93c05bf73b  swarmchat/page/index.html
+ffc0c31c3a16278b2ab3fd12fe38cbe2a0dd71d503fd80fc8b12d924c36fc8e3  swarmchat/policy.py
+9421d1a3bd5ff94b7fd0acef0090bebb73aa702de24bf909f6c695050a098588  swarmchat/server.py
+3ebfc60d90a1ee3aa774e87dd47b932bdd88acea6a62c8408cfe0d98bc91493d  swarmchat/store.py
+96479a1ecb495cd56ffed1090155e7d6cf30edac021fea6f54d443ae7a37531b  swarmchat/view.py
+903fcf6a34bc80ba5bf63cc059b9d49a51932760d9a5af96fddd403943599458  tests/test_by_hand.py
+5fc523006388cfc7d46f0a43d369fbe89d8ae500d9e0ab6637d7bbf187790e9c  tests/test_delivery.py
+9edcdd5447334779f755d35dd51c91b5b32cea6178897baf51cf6d46ec76b3cb  tests/test_files.py
+81224058cea536ab766df0b6387ee525e9f76c454ced825f7b97638fe7ead499  tests/test_storage_safety.py
+30e39d13c4b31e3932826e022c383689d44711e9d37c42a64bac61473927f1a7  tests/test_swarmchat.py
+3cdb8df7894f8364990630ac711351211db0b41bb16b85270cadab8f10ed0af4  tests/test_transport.py
+2896df1996b9c31906bf034c3f52615672b65a0acedb895fc16981c697ea0428  tests/test_view.py
+```

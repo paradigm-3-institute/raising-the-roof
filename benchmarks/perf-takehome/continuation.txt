@@ -1,0 +1,10 @@
+ENVIRONMENT FEEDBACK: Your turn ended, but this task is NOT finished and you still have many HOURS of compute budget remaining. Do not stop and do not conclude - treat this as a long-running optimization effort and keep going.
+
+Your best submitted kernel so far is already saved and safe. Your job now is to BEAT it. Hitting a plateau is not a reason to stop; it is a signal to try a structurally DIFFERENT approach.
+
+Take another turn now. Do not answer only in prose - use tool calls (bash):
+  - Re-read the task instruction, Readme.md, problem.py and your current perf_takehome.py, and recall your best cycle count so far (`scores`).
+  - Try a fundamentally different optimization than the ones you have already tried, for example: a different instruction schedule or bundle packing, a different use of the vector engines, a different data layout in scratch, restructuring the loop over rounds and batch items, removing work the result does not need, or systematic tuning of your kernel generator.
+  - Edit perf_takehome.py in your working copy, check it with `python3 tests/submission_tests.py`, and run `submit` to get a fresh graded score. Submit early and often; every improvement over your best counts.
+
+Keep iterating and keep submitting for as long as you can make progress. Only stop if you have genuinely exhausted clearly distinct approaches. Continue working now.

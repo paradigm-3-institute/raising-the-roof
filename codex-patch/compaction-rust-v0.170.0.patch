@@ -1,0 +1,12 @@
+diff --git a/codex-rs/core/src/context_manager/history.rs b/codex-rs/core/src/context_manager/history.rs
+index 4c07b7fb3f..8b72c4984e 100644
+--- a/codex-rs/core/src/context_manager/history.rs
++++ b/codex-rs/core/src/context_manager/history.rs
+@@ -1170,7 +1170,6 @@ impl ContextManager {
+             last_tokens.saturating_add(unreported_tokens)
+         } else {
+             last_tokens
+-                .saturating_add(self.get_non_last_reasoning_items_tokens())
+                 .saturating_add(unreported_tokens)
+         }
+     }

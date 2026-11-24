@@ -1,0 +1,3 @@
+#!/bin/sh
+# Promote your working copy into /app (see /opt/fswe/fswe.py).
+exec python3 /opt/fswe/fswe.py submit "$@"
